@@ -111,6 +111,7 @@ h1 {
 
 .message {
   margin-bottom: 8rem;
+  line-height: 40px;
   height: 3rem;
 }
 
