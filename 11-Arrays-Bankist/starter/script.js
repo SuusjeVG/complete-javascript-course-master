@@ -74,3 +74,14 @@ const currencies = new Map([
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 /////////////////////////////////////////////////
+
+
+movements.forEach( (item, index) => {
+  if (item > 0 ) {
+    console.log(`Movement ${index + 1}, you deposited ${item} 🤑`);
+  } else {
+    console.log(`Movement ${index + 1}, You withdrew ${Math.abs(item) } ❌`);
+  }
+})
+
+console.log(currencies);
