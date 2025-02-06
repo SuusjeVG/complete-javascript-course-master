@@ -47,7 +47,7 @@ const labelTimer = document.querySelector('.timer');
 const containerApp = document.querySelector('.app');
 const containerMovements = document.querySelector('.movements');
 
-const btnLogin = document.querySelector('.login__btn');
+const loginbtn = document.querySelector('.login__btn');
 const btnTransfer = document.querySelector('.form__btn--transfer');
 const btnLoan = document.querySelector('.form__btn--loan');
 const btnClose = document.querySelector('.form__btn--close');
@@ -81,22 +81,19 @@ const displayMovements = function (movements) {
 
 }
 
-displayMovements(account1.movements)
-
 // calc and display total balance
-const calcDisplayBalance = function(movements) {
-  const balance = movements.reduce( (acc, value) => {
+const calcDisplayBalance = function(acc) {
+  acc.balance = acc.movements.reduce( (acc, value) => {
     return acc + value
   }, 0)
 
-  labelBalance.innerText = ` ${balance.toString()} EUR `
+  labelBalance.innerText = ` ${acc.balance.toString()} EUR `
 }
-calcDisplayBalance(account1.movements)
 
 //display the summery
-const calcDisplaySummery = function (movements) {
+const calcDisplaySummery = function (acc) {
   // total deposit
-  const deposits = movements.filter((value) => {
+  const deposits = acc.movements.filter((value) => {
     return value > 0 
   })
   const totalIn = deposits.reduce((acc, value) => {
@@ -106,7 +103,7 @@ const calcDisplaySummery = function (movements) {
   labelSumIn.textContent = `${totalIn}€`
 
   // total withdrawaks
-  const withdrawals = movements.filter((value) => {
+  const withdrawals = acc.movements.filter((value) => {
     return value < 0 
   })
   const totalOut = withdrawals.reduce((acc, value) => {
@@ -115,7 +112,7 @@ const calcDisplaySummery = function (movements) {
   labelSumOut.textContent = `${Math.abs(totalOut)}€`
 
   const interest = deposits
-    .map(value => value * 1.2/100)
+    .map(deposit => (deposit * acc.interestRate) /100)
     .filter(value => value >= 1 )
     .reduce((acc, value) => {
       return acc + value
@@ -124,7 +121,6 @@ const calcDisplaySummery = function (movements) {
   labelSumInterest.textContent = `${interest}€`
 }
 
-calcDisplaySummery(account1.movements) 
 // create short username and add to the object
 const createUsernames = function (accs) {
   accs.forEach(function (acc) {
@@ -137,9 +133,122 @@ const createUsernames = function (accs) {
 }
 
 createUsernames(accounts);
-// console.log(accounts);
 
+// update UI function
+const updateUI = function(acc) {
+    // Display movements
+    displayMovements(acc.movements)
+    // Display total balance
+    calcDisplayBalance(acc)
+    // Display summery
+    calcDisplaySummery(acc) 
+}
 
+// event handler
+let currentAccount;
+
+loginbtn.addEventListener( 'click', function(e) {
+  e.preventDefault()
+  currentAccount = accounts.find(acc => acc.username === inputLoginUsername.value )
+
+  // Login
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+    // Display welcome text and UI
+    labelWelcome.textContent = `Welcome ${currentAccount.owner}`
+    containerApp.style.opacity = 1;
+
+    //clear input fields
+    inputLoginUsername.value = ''
+    inputLoginPin.value = ''
+    inputLoginPin.blur()
+    
+    updateUI(currentAccount)
+
+  } else {
+    console.log('Wrong login');
+  }
+});
+
+// transfer money to other accounts
+btnTransfer.addEventListener('click', (e) => {
+  e.preventDefault()
+
+  const receiverAcc = accounts.find(acc => acc.username === inputTransferTo.value)
+  const amount = Number(inputTransferAmount.value)
+
+  inputTransferTo.value = ''
+  inputTransferAmount.value = ''
+
+  if (
+    amount > 0 && 
+    receiverAcc &&
+    amount <= currentAccount.balance &&
+    receiverAcc?.username !== currentAccount.username
+  ) {
+
+    //doing the transfer
+    currentAccount.movements.push(-amount);
+    receiverAcc.movements.push(amount);
+
+    //update UI
+    updateUI(currentAccount)
+ 
+  } else {
+    console.log('transfer failed');
+  }
+
+})
+
+// adding loan too your account
+btnLoan.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  const amount = Number(inputLoanAmount.value);
+  // only grants loan if there is atleast one deposit with atleast 10% value of the requested loan amount.
+  const request = currentAccount.movements.some( (mov) => {
+    return mov >= amount * 0.10
+  })
+
+  if (amount > 0 && request) {
+    // add movement to array
+    currentAccount.movements.push(amount);
+
+    // update UI
+    updateUI(currentAccount)
+  }
+
+  inputLoanAmount.value = ' '
+})
+
+// delete your account
+btnClose.addEventListener('click', (e) => {
+  e.preventDefault()
+  // let inputUser = inputCloseUsername.value
+  // let inputPin = Number(inputClosePin.value) 
+
+  if (
+    inputCloseUsername.value === currentAccount.username && 
+    Number(inputClosePin.value)  === currentAccount.pin
+  ) {
+    // find user index
+    const index = accounts.findIndex( function (acc) {
+      return acc.username === inputCloseUsername.value
+    });
+
+    // delete user
+    accounts.splice(index, 1)
+
+    // Hide UI
+    containerApp.style.opacity = 0;
+
+  } else {
+    console.log('false');
+  }
+
+  // set fields to empty
+  inputCloseUsername.value = ''
+  inputClosePin.value = ''
+})
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
@@ -194,9 +303,20 @@ const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 // }, movements[0]);
 // console.log(max);
 
+// Find method 
+// let accountJessica = {};
 
+// for (const element of accounts) {
+//   if (element.owner === 'Jessica Davis'){
+//     accountJessica = element
+//   }
+// }
 
+// console.log(accountJessica);
 
+/**********
+ * Coding Challenge #1
+ *********/
 /*
   Julia and Kate are doing a study on dogs. So each of them asked 5 dog owners
   about their dog's age, and stored the data into an array (one array for each). For
@@ -302,14 +422,14 @@ const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
   § Data 2: [16, 6, 10, 5, 6, 1, 4]
   GOOD LUCK
 */
-const dogAges = [5, 2, 4, 1, 15, 8, 3]
+// const dogAges = [5, 2, 4, 1, 15, 8, 3]
 
-const calcAverageHumanAge = function(array) {
-    const humanAges = array
-      .map(dogAge => dogAge <= 2 ? dogAge * 2 : 16 + dogAge * 4)  
-      .filter( age => age >= 18)
-      .reduce((acc, age, i, arr) =>  acc + age / arr.length, 0)
+// const calcAverageHumanAge = function(array) {
+//     const humanAges = array
+//       .map(dogAge => dogAge <= 2 ? dogAge * 2 : 16 + dogAge * 4)  
+//       .filter( age => age >= 18)
+//       .reduce((acc, age, i, arr) =>  acc + age / arr.length, 0)
   
-    console.log(humanAges);
-}
-calcAverageHumanAge(dogAges)
+//     console.log(humanAges);
+// }
+// calcAverageHumanAge(dogAges)
