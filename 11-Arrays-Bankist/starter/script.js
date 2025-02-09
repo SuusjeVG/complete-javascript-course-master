@@ -62,11 +62,13 @@ const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
 // display all movements of an account with html blocks and the right info per account
-const displayMovements = function (movements) {
+const displayMovements = function (movements, sort = false) {
   // destroy first html elements
   containerMovements.innerHTML = "";
 
-  movements.forEach((item, i) => {
+  const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
+
+  movs.forEach((item, i) => {
     const type = item > 0 ? 'deposit' : 'withdrawal';
     const html = `
       <div class="movements__row">
@@ -76,7 +78,6 @@ const displayMovements = function (movements) {
     `;
 
     containerMovements.insertAdjacentHTML( "afterbegin" , html)
-
   });
 
 }
@@ -250,6 +251,15 @@ btnClose.addEventListener('click', (e) => {
   inputClosePin.value = ''
 })
 
+let sorted = false;
+
+btnSort.addEventListener('click', (e) => {
+  e.preventDefault()
+  displayMovements(currentAccount.movements, sorted = !sorted)
+})
+
+
+
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
@@ -313,6 +323,54 @@ const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 // }
 
 // console.log(accountJessica);
+
+
+// Dice
+// const diceArray = Array.from( {length: 100}, (_, i) => i + 1 )
+// const random = Math.trunc(Math.random() * diceArray.length)
+// console.log(random);
+
+// Extra exercise
+// 1. Create new array with all the incomes of the bank from all accounts
+// const allIncomes = accounts
+//   .flatMap((acc) => {
+//     return acc.movements
+//   })
+//   .filter((mov => mov > 0))
+//   .reduce((acc, deposit) => acc + deposit, 0)
+
+// console.log(allIncomes);
+
+// 2.how many deposit are there with atleast 1000 dollars
+// const deposits = accounts
+//   .flatMap(acc => acc.movements)
+//   .filter(mov => mov >= 1000).length
+
+// console.log(deposits);
+
+// 3. create a new obejct instead of a number or string for the different movements (depo, withdrawels). 
+// const {deposits, withdrawals} = accounts
+// const totalBankObject = accounts
+//   .flatMap(acc => acc.movements)
+//   .reduce((sums, current) => {
+
+//   }, {deposits: 0, withdrawals: 0})
+
+// console.log(totalBankObject);
+
+// 4. use reduce method only instead of filter map etc
+// let allMovements = []
+// const test = accounts.reduce((sums, current) => {
+//   allMovements.push(...current.movements)
+//   allMovements > 0 ? sums + allMovements : sums
+//   // current > 0 ? sums.deposits += current  : sums.withdrawals += current
+//   return sums
+// }, 0)
+
+// console.log(allMovements);
+// console.log(test);
+
+
 
 /**********
  * Coding Challenge #1
@@ -433,3 +491,205 @@ const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 //     console.log(humanAges);
 // }
 // calcAverageHumanAge(dogAges)
+
+
+/**********
+ * Coding Challenge #4
+ *********/
+
+/*
+This time, Julia and Kate are studying the activity levels of different dog breeds.
+
+YOUR TASKS:
+1. Store the average weight of a "Husky" in a variable "huskyWeight"
+2. Find the name of the only breed that likes both "running" and "fetch" ("dogBothActivities" variable)
+3. Create an array "allActivities" of all the activities of all the dog breeds
+4. Create an array "uniqueActivities" that contains only the unique activities (no activity repetitions). HINT: Use a technique with a special data structure that we studied a few sections ago.
+5. Many dog breeds like to swim. What other activities do these dogs like? Store all the OTHER activities these breeds like to do, in a unique array called "swimmingAdjacent".
+6. Do all the breeds have an average weight of 10kg or more? Log to the console whether "true" or "false".
+7. Are there any breeds that are "active"? "Active" means that the dog has 3 or more activities. Log to the console whether "true" or "false".
+
+BONUS: What's the average weight of the heaviest breed that likes to fetch? HINT: Use the "Math.max" method along with the ... operator.
+
+TEST DATA:
+*/
+
+
+const breeds = [
+  {
+    breed: 'German Shepherd',
+    averageWeight: 32,
+    activities: ['fetch', 'swimming'],
+  },
+  {
+    breed: 'Dalmatian',
+    averageWeight: 24,
+    activities: ['running', 'fetch', 'agility'],
+  },
+  {
+    breed: 'Labrador',
+    averageWeight: 28,
+    activities: ['swimming', 'fetch'],
+  },
+  {
+    breed: 'Beagle',
+    averageWeight: 12,
+    activities: ['digging', 'fetch'],
+  },
+  {
+    breed: 'Husky',
+    averageWeight: 26,
+    activities: ['running', 'agility', 'swimming'],
+  },
+  {
+    breed: 'Bulldog',
+    averageWeight: 36,
+    activities: ['sleeping'],
+  },
+  {
+    breed: 'Poodle',
+    averageWeight: 18,
+    activities: ['agility', 'fetch'],
+  },
+];
+
+// 1. Store the average weight of a "Husky" in a variable "huskyWeight"
+// const huskyWeight = breeds.find(dog => dog.breed === 'Husky').averageWeight;
+
+// 2. Find the name of the only breed that likes both "running" and "fetch" ("dogBothActivities" variable)
+// const dogBothActivities = breeds
+  // .find((dog) => dog.activities.includes('fetch') && dog.activities.includes('running'))
+
+// 3. Create an array "allActivities" of all the activities of all the dog breeds
+// const allActivities = breeds.flatMap( (dog) => dog.activities )
+
+// 4. Create an array "uniqueActivities" that contains only the unique activities (no activity repetitions). 
+// const uniqueActivities = [...new Set(allActivities)]
+
+// 5. Many dog breeds like to swim. What other activities do these dogs like? Store all the OTHER activities these breeds like to do, in a unique array called "swimmingAdjacent".
+// const swimmingAdjacent = [...new Set(breeds
+//   .filter((breed) => breed.activities.includes('swimming'))
+//   .flatMap((breed) => breed.activities))]
+//   .filter((activity) => activity !== 'swimming')
+  
+// console.log(swimmingAdjacent);
+
+// 6. Do all the breeds have an average weight of 10kg or more? Log to the console whether "true" or "false".
+// breeds.forEach((breed) => breed.averageWeight >= 10 ? console.log('true') : console.log('false'));
+// breeds.every((breed) => breed.averageWeight >= 10 ? console.log('true') : console.log('false'));
+
+// 7. Are there any breeds that are "active"? "Active" means that the dog has 3 or more activities. Log to the console whether "true" or "false".
+// breeds.forEach((breed) => breed.activities.length >= 3 ? console.log('true') : console.log('false'));
+// console.log(breeds.some((breed) => breed.activities.length >= 3 ));
+
+// BONUS: What's the average weight of the heaviest breed that likes to fetch? HINT: Use the "Math.max" method along with the ... operator.
+
+// const fetchBreeds = breeds.filter((breed) => breed.activities.includes('fetch') )
+// const averageWeightFetch = filterFetch.reduce((acc, value) => (acc + value.averageWeight) / fetchBreeds.length, 0)
+
+// const averageWeightFetch = breeds
+//   .filter((breed) => breed.activities.includes('fetch') )
+//   .map((breed) => breed.averageWeight )
+// const heaviestDog = Math.max(...averageWeightFetch);
+
+// const averageWeightFetch = Math.max(...breeds
+//   .filter((breed) => breed.activities.includes('fetch') )
+//   .map((breed) => breed.averageWeight ))
+  
+// console.log(Math.max(averageWeightFetch));
+
+/**********
+ * Coding Challenge #5
+ *********/
+
+/*
+  Julia and Kate are still studying dogs, and this time they are studying if dogs are
+  eating too much or too little.
+  Eating too much means the dog's current food portion is larger than the
+  recommended portion, and eating too little is the opposite.
+  Eating an okay amount means the dog's current food portion is within a range 10%
+  above and 10% below the recommended portion (see hint).
+  Your tasks:
+
+  1. Loop over the 'dogs' array containing dog objects, and for each dog, calculate
+  the recommended food portion and add it to the object as a new property. Do
+  not create a new array, simply loop over the array. Forumla:
+  recommendedFood = weight ** 0.75 * 28. (The result is in grams of
+  food, and the weight needs to be in kg)
+  2. Find Sarah's dog and log to the console whether it's eating too much or too
+  little. Hint: Some dogs have multiple owners, so you first need to find Sarah in
+  the owners array, and so this one is a bit tricky (on purpose) �
+  3. Create an array containing all owners of dogs who eat too much
+  ('ownersEatTooMuch') and an array with all owners of dogs who eat too little
+  ('ownersEatTooLittle').
+  4. Log a string to the console for each array created in 3., like this: "Matilda and
+  Alice and Bob's dogs eat too much!" and "Sarah and John and Michael's dogs eat
+  too little!"
+  5. Log to the console whether there is any dog eating exactly the amount of food
+  that is recommended (just true or false)
+  6. Log to the console whether there is any dog eating an okay amount of food
+  (just true or false)
+  7. Create an array containing the dogs that are eating an okay amount of food (try
+  to reuse the condition used in 6.)
+  8. Create a shallow copy of the 'dogs' array and sort it by recommended food
+  portion in an ascending order (keep in mind that the portions are inside the
+  array's objects ) 
+
+  Hints:
+  § Use many different tools to solve these challenges, you can use the summary
+  lecture to choose between them �
+  § Being within a range 10% above and below the recommended portion means:
+  current > (recommended * 0.90) && current < (recommended *
+  1.10). Basically, the current portion should be between 90% and 110% of the
+  recommended portion.
+
+*/
+
+// TEST DATA:
+const dogs = [
+  { weight: 22, curFood: 250, owners: ['Alice', 'Bob'] },
+  { weight: 8, curFood: 200, owners: ['Matilda'] },
+  { weight: 13, curFood: 275, owners: ['Sarah', 'John'] },
+  { weight: 32, curFood: 340, owners: ['Michael'] }
+];
+
+// Forumla:
+// recommendedFood = weight ** 0.75 * 28. (The result is in grams of
+// food, and the weight needs to be in kg)
+
+// let sarahsDog;
+// const ownersEatTooLittle = [];
+// const ownersEatTooMuch = [];
+// const foodSteady = [];
+
+// dogs.forEach((dog) => {
+//   // adding item to dogs object
+//   const recommendedFood = dog.weight ** 0.75 * 28;
+//   dog.recommendedFood = recommendedFood;
+
+//   // loging result to see the truth
+//   console.log(dog.recommendedFood, '----', dog.curFood);
+//   console.log(dog.recommendedFood * 0.9, '---' , dog.curFood ,  '---', dog.recommendedFood * 1.1 );
+
+//   sarahsDog = dog.owners.find(name => name === 'Sarah');
+
+//   // condition to see if the current food is to low or high
+//   if (dog.recommendedFood * 0.9 > dog.curFood) {
+//     ownersEatTooLittle.push(...dog.owners)
+//     // console.log(foodToLow);
+//     // console.log(' current food is too low');
+//   } else if (dog.recommendedFood * 1.1 < dog.curFood ) {
+//     ownersEatTooMuch.push(...dog.owners)
+//     // console.log(foodToHigh);
+//     // console.log(' current food is too high');
+//   } else {
+//     foodSteady.push(...dog.owners)
+//     // console.log(foodSteady);
+//     // console.log('current food is steady');
+//   }
+
+// })
+
+// console.log(ownersEatTooLittle, ownersEatTooMuch, foodSteady);
+
+// console.log(dogs);
