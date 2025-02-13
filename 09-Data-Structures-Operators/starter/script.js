@@ -698,4 +698,115 @@ for (const player of game.scored) {
 
 console.log(scorers);
 
+/******************
+* Coding Challenge #3
+******************/
 
+/* 
+Let's continue with our football betting app! This time, we have a map with a log of the events that happened during the game. The values are the events themselves, and the keys are the minutes in which each event happened (a football game has 90 minutes plus some extra time).
+
+1. Create an array 'events' of the different game events that happened (no duplicates)
+2. After the game has finished, is was found that the yellow card from minute 64 was unfair. So remove this event from the game events log.
+3. Print the following string to the console: "An event happened, on average, every 9 minutes" (keep in mind that a game has 90 minutes)
+4. Loop over the events and log them to the console, marking whether it's in the first half or second half (after 45 min) of the game, like this:
+      [FIRST HALF] 17: ⚽️ GOAL
+
+GOOD LUCK 😀
+*/
+
+const gameEvents = new Map([
+  [17, '⚽️ GOAL'],
+  [36, '🔁 Substitution'],
+  [47, '⚽️ GOAL'],
+  [61, '🔁 Substitution'],
+  [64, '🔶 Yellow card'],
+  [69, '🔴 Red card'],
+  [70, '🔁 Substitution'],
+  [72, '🔁 Substitution'],
+  [76, '⚽️ GOAL'],
+  [80, '⚽️ GOAL'],
+  [92, '🔶 Yellow card'],
+]);
+
+//  1. Create an array 'events' of the different game events that happened (no duplicates)
+const events = [...new Set(gameEvents.values())]
+console.log(events);
+
+// 2. After the game has finished, is was found that the yellow card from minute 64 was unfair. So remove this event from the game events log.
+gameEvents.delete(64)
+console.log(gameEvents);
+
+// 3. Print the following string to the console: "An event happened, on average, every 9 minutes" (keep in mind that a game has 90 minutes)
+const gameMinutes = 90;
+console.log(`An event happened, on average, every ${gameMinutes / gameEvents.size} minutes"`);
+
+// if you want the last index
+const time = [...gameEvents.keys()].pop();
+console.log(`An event happened, on average, every ${time / gameEvents.size} minutes"`);
+
+
+// 4. Loop over the events and log them to the console, marking whether it's in the first half or second half (after 45 min) of the game, like this:
+//       [FIRST HALF] 17: ⚽️ GOAL
+
+for (const [key, value] of gameEvents) {
+  if( key <= 45 ) {
+    console.log(`[FIRST HALF] ${key}: ${value}`);
+  } else {
+    console.log(`[SECOND HALF] ${key}: ${value}`);
+  }
+}
+
+console.log('-----------------');
+for (const [key, value] of gameEvents) {
+  console.log(`[${ key <= 45 ? "FIRST" : "SECOND"} HALF] ${key}: ${value}`);
+}
+
+
+/******************
+* Coding Challenge #4
+******************/
+/*
+Write a program that receives a list of variable names written in underscore_case and convert them to camelCase.
+
+The input will come from a textarea inserted into the DOM (see code below), and conversion will happen when the button is pressed.
+
+THIS TEST DATA (pasted to textarea)
+underscore_case
+ first_name
+Some_Variable 
+  calculate_AGE
+delayed_departure
+
+SHOULD PRODUCE THIS OUTPUT (5 separate console.log outputs)
+underscoreCase      ✅
+firstName           ✅✅
+someVariable        ✅✅✅
+calculateAge        ✅✅✅✅
+delayedDeparture    ✅✅✅✅✅
+
+HINT 1: Remember which character defines a new line in the textarea 😉
+HINT 2: The solution only needs to work for a variable made out of 2 words, like a_b
+HINT 3: Start without worrying about the ✅. Tackle that only after you have the variable name conversion working 😉
+HINT 4: This challenge is difficult on purpose, so start watching the solution in case you're stuck. Then pause and continue!
+
+Afterwards, test with your own test data!
+
+GOOD LUCK 😀
+*/
+
+// Ik Wil Dat Elke Letter
+
+const capitlize = function(string) {
+  const exeptions = ['de', 'het', 'een', 'en', 'maar', 'of', 'in', 'met'];
+
+  const capitilizedString = string
+    .toLowerCase()
+    .split(' ')
+    .map( word => exeptions.includes(word) ? word : word[0].toUpperCase() + word.slice(1))
+    .join(' ')
+
+
+  return capitilizedString
+}
+
+console.log(capitlize('Ik ben een meisje met bruin HAAR'));
