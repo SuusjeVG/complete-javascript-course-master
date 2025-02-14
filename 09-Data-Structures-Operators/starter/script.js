@@ -794,19 +794,48 @@ Afterwards, test with your own test data!
 GOOD LUCK 😀
 */
 
-// Ik Wil Dat Elke Letter
+// 1.
 
-const capitlize = function(string) {
-  const exeptions = ['de', 'het', 'een', 'en', 'maar', 'of', 'in', 'met'];
+// $textarea = document.querySelector('#text-input')
+// console.log($textarea);
 
-  const capitilizedString = string
-    .toLowerCase()
-    .split(' ')
-    .map( word => exeptions.includes(word) ? word : word[0].toUpperCase() + word.slice(1))
-    .join(' ')
+/* EXTRA FOR MYSELF
+
+// const maskCreditCard = function (number) {
+//   let str = number + "";
+//   const maskedNumebr = str
+//     .slice(-4)
+//     .padStart(str.length, '*')
 
 
-  return capitilizedString
-}
+//   return maskedNumebr
+// }
 
-console.log(capitlize('Ik ben een meisje met bruin HAAR'));
+// console.log(maskCreditCard(12335464567))
+
+// const capitlizeName = function(name) {
+//   let fullName = name
+//     .toLowerCase()
+//     .split(' ')
+//     .map(name => name[0].toUpperCase() + name.slice(1))
+//     .join(' ')
+
+//   return fullName
+// }
+
+// console.log(capitlizeName('jessica ann smith davis'));
+// console.log(capitlizeName('susan van Glabbeek'));
+// const capitlize = function(string) {
+//   const exeptions = ['de', 'het', 'een', 'en', 'maar', 'of', 'in', 'met'];
+
+//   const capitilizedString = string
+//     .toLowerCase()
+//     .split(' ')
+//     .map( word => exeptions.includes(word) ? word : word[0].toUpperCase() + word.slice(1))
+//     .join(' ')
+
+
+//   return capitilizedString
+// }
+
+// console.log(capitlize('Ik ben een meisje met bruin HAAR'));
