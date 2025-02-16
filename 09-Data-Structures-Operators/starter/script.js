@@ -794,12 +794,26 @@ Afterwards, test with your own test data!
 GOOD LUCK 😀
 */
 
-// 1.
+// 1.Write a program that receives a list of variable names written in underscore_case and convert them to camelCase.
+const $textarea = document.querySelector('#text-input')
+const $button = document.querySelector('#button')
 
-// $textarea = document.querySelector('#text-input')
-// console.log($textarea);
+$button.addEventListener('click', (e) => {
+  const input = $textarea.value
+    .toLowerCase()
+    .replaceAll('\n', ' ')
+    .split(' ') 
+    .filter(word => word !== '');
 
-/* EXTRA FOR MYSELF
+    const [underscoreCase, firstName, someVariable, calculateAge, delayedDeparture] = input
+
+  console.log(underscoreCase, firstName, someVariable, calculateAge, delayedDeparture)
+})
+
+
+
+
+// EXTRA FOR MYSELF
 
 // const maskCreditCard = function (number) {
 //   let str = number + "";
@@ -839,3 +853,4 @@ GOOD LUCK 😀
 // }
 
 // console.log(capitlize('Ik ben een meisje met bruin HAAR'));
+
