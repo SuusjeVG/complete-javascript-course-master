@@ -1,8 +1,7 @@
 'use strict';
 
 // Data needed for a later exercise
-const flights =
-  '_Delayed_Departure;fao93766109;txl2133758440;11:25+_Arrival;bru0943384722;fao93766109;11:45+_Delayed_Arrival;hel7439299980;fao93766109;12:05+_Departure;fao93766109;lis2323639855;12:30';
+// const flights = '_Delayed_Departure;fao93766109;txl2133758440;11:25+_Arrival;bru0943384722;fao93766109;11:45+_Delayed_Arrival;hel7439299980;fao93766109;12:05+_Departure;fao93766109;lis2323639855;12:30';
 
 // Data needed for first part of the section
 const restaurant = {
@@ -796,22 +795,40 @@ GOOD LUCK 😀
 
 // 1.Write a program that receives a list of variable names written in underscore_case and convert them to camelCase.
 const $textarea = document.querySelector('#text-input')
-const $button = document.querySelector('#button')
-
-$button.addEventListener('click', (e) => {
-  const input = $textarea.value
-    .toLowerCase()
-    .replaceAll('\n', ' ')
-    .split(' ') 
-    .filter(word => word !== '');
-
-    const [underscoreCase, firstName, someVariable, calculateAge, delayedDeparture] = input
-
-  console.log(underscoreCase, firstName, someVariable, calculateAge, delayedDeparture)
-})
+const $button = document.querySelector('#btn')
 
 
+// let vinkje = ' '
+// $button.addEventListener('click', (event) => {
+//   const input = $textarea.value
+//     .toLowerCase()
+//     .split("\n")
 
+//   for (const word of input) {
+//     let [firstwoord, secondWoord] = word.trim().split('_')
+
+//     // let output = firstwoord + secondWoord.replace(secondWoord[0], secondWoord[0].toUpperCase())
+//     let output = firstwoord + (secondWoord[0].toUpperCase() + secondWoord.slice(1))
+
+//     console.log(`${output.padEnd(20, ' ')} ${vinkje += '✅'}`);
+//   }
+
+// })
+
+$button.addEventListener('click', function () {
+  const text = document.querySelector('#text-input').value;
+  const rows = text.split('\n');
+
+  for (const [i, row] of rows.entries()) {
+    const [first, second] = row.toLowerCase().trim().split('_');
+
+    const output = `${first}${second.replace(
+      second[0],
+      second[0].toUpperCase()
+    )}`;
+    console.log(`${output.padEnd(20)}${'✅'.repeat(i + 1)}`);
+  }
+});
 
 // EXTRA FOR MYSELF
 
@@ -854,3 +871,34 @@ $button.addEventListener('click', (e) => {
 
 // console.log(capitlize('Ik ben een meisje met bruin HAAR'));
 
+///////////////////////////////////////
+// String Methods Practice
+
+const flights =
+  '_Delayed_Departure;fao93766109;txl2133758440;11:25+_Arrival;bru0943384722;fao93766109;11:45+_Delayed_Arrival;hel7439299980;fao93766109;12:05+_Departure;fao93766109;lis2323639855;12:30';
+
+// 🔴 Delayed Departure from FAO to TXL (11h25)
+//              Arrival from BRU to FAO (11h45)
+//   🔴 Delayed Arrival from HEL to FAO (12h05)
+//            Departure from FAO to LIS (12h30)
+
+// make code better
+const getCode = str => str.slice(0, 3).toUpperCase()
+
+const seperateFlights = flights.split('+')
+
+for (const flight of seperateFlights) {
+  const singleflight = flight.split(';');
+  let [status, from, to, time] = singleflight
+
+  //get delayed or not
+  status = status.replaceAll('_', ' ').trimStart();
+
+  // get cournty (optional use function)
+  from = from.slice(0, 3).toUpperCase()
+  to = to.slice(0, 3).toUpperCase()
+
+  console.log(`${status.includes('Delayed') ? '🔴 ' + status : status } from ${from} to ${to} (${time.replace(':', 'h')})`.padStart(44));
+
+}
+// console.log(seperateFlights);
