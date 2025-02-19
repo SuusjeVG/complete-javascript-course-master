@@ -902,3 +902,5 @@ for (const flight of seperateFlights) {
 
 }
 // console.log(seperateFlights);
+
+

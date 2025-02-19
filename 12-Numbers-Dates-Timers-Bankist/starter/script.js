@@ -78,25 +78,49 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
+/////////////////
+// current date
+const currentDate = new Date();
+const day = `${currentDate.getDate()}`.padStart(2, '0');
+const month = `${currentDate.getMonth() + 1}`.padStart(2, '0');
+const year = currentDate.getFullYear();
+const hours = `${currentDate.getHours()}`.padStart(2, '0')
+const minutes = `${currentDate.getMinutes()}`.padStart(2, '0');
+const dateString = `${day}/${month}/${year}, ${hours}:${minutes}`
+
+
+labelDate.textContent = dateString
+
+
 /////////////////////////////////////////////////
 // Functions
 
-const displayMovements = function (movements, sort = false) {
+const displayMovements = function (acc, sort = false) {
   containerMovements.innerHTML = '';
 
-  const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
+  const movs = sort ? acc.movements.slice().sort((a, b) => a - b) : acc.movements;
 
   movs.forEach(function (mov, i) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
+
+    const date = new Date(acc.movementsDates[i])
+    const day = `${date.getDate()}`.padStart(2, '0');
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
+    const year = date.getFullYear();
+    const displayDate = `${day}/${month}/${year}`
 
     const html = `
       <div class="movements__row">
         <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
+        <div class="movements__date">${displayDate}</div>
         <div class="movements__value">${mov.toFixed(2)}€</div>
       </div>
     `;
+
+    // my solution
+    // <div class="movements__date">${acc.movementsDates[i].slice(0, 10).replaceAll('-', '/')}</div>
 
     containerMovements.insertAdjacentHTML('afterbegin', html);
   });
@@ -142,7 +166,7 @@ createUsernames(accounts);
 
 const updateUI = function (acc) {
   // Display movements
-  displayMovements(acc.movements);
+  displayMovements(acc);
 
   // Display balance
   calcDisplayBalance(acc);
@@ -211,7 +235,8 @@ btnLoan.addEventListener('click', function (e) {
   if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
     // Add movement
     currentAccount.movements.push(amount);
-
+    currentAccount.movementsDates.push(dateString)
+    
     // Update UI
     updateUI(currentAccount);
   }
@@ -244,7 +269,7 @@ btnClose.addEventListener('click', function (e) {
 let sorted = false;
 btnSort.addEventListener('click', function (e) {
   e.preventDefault();
-  displayMovements(currentAccount.movements, !sorted);
+  displayMovements(currentAccount, !sorted);
   sorted = !sorted;
 });
 
@@ -292,3 +317,40 @@ const isEven = function(numb) {
 
 isEven(3)
 isEven(9)
+
+///////////////////////////////////////
+// Working with BigInt
+// console.log(2 ** 53 - 1);
+// console.log(Number.MAX_SAFE_INTEGER);
+// console.log(2 ** 53 + 1);
+// console.log(2 ** 53 + 2);
+// console.log(2 ** 53 + 3);
+// console.log(2 ** 53 + 4);
+
+// console.log(4838430248342043823408394839483204n);
+// console.log(BigInt(48384302));
+
+// // Operations
+// console.log(10000n + 10000n);
+// console.log(36286372637263726376237263726372632n * 10000000n);
+// // console.log(Math.sqrt(16n));
+
+// const huge = 20289830237283728378237n;
+// const num = 23;
+// console.log(huge * BigInt(num));
+
+// // Exceptions
+// console.log(20n > 15);
+// console.log(20n === 20);
+// console.log(typeof 20n);
+// console.log(20n == '20');
+
+// console.log(huge + ' is REALLY big!!!');
+
+// // Divisions
+// console.log(11n / 3n);
+// console.log(10 / 3);
+
+///////////////////
+// Date
+
