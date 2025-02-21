@@ -79,12 +79,12 @@ const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
 
-let currentAccount;
+let currentAccount, timer;
 
 /////////////////
 // current date
 const currentDate = new Date();
-const options = {
+const optionsDate = {
   hour: 'numeric',
   minute: 'numeric',
   day: 'numeric',
@@ -122,10 +122,18 @@ const displayMovDate = function(dateStr) {
     // return `${day}/${month}/${year}`
 
     // with the formatter API for different languages
-    return new Intl.DateTimeFormat(currentAccount.locale, { day: '2-digit', month: '2-digit', year: 'numeric'}).format(date)
+    return new Intl.DateTimeFormat(
+      currentAccount.locale, 
+      { day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric'
+      }).format(date)
   }
 }
 
+const formatCurr = function(locale, currency, value) {
+  return new Intl.NumberFormat(locale, {style: 'currency', currency: currency}).format(value)
+}
 
 const displayMovements = function (acc, sort = false) {
   containerMovements.innerHTML = '';
@@ -142,6 +150,7 @@ const displayMovements = function (acc, sort = false) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
 
     const displayDate = displayMovDate(movementsDate)
+    const formatedMov = formatCurr(acc.locale, acc.currency, mov)
 
     const html = `
       <div class="movements__row">
@@ -149,7 +158,7 @@ const displayMovements = function (acc, sort = false) {
       i + 1
     } ${type}</div>
         <div class="movements__date">${displayDate}</div>
-        <div class="movements__value">${mov.toFixed(2)}€</div>
+        <div class="movements__value">${formatedMov}</div>
       </div>
     `;
 
@@ -162,19 +171,20 @@ const displayMovements = function (acc, sort = false) {
 
 const calcDisplayBalance = function (acc) {
   acc.balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
-  labelBalance.textContent = `${acc.balance.toFixed(2)}€`;
+  
+  labelBalance.textContent = `${formatCurr(acc.locale, acc.currency, acc.balance) }`;
 };
 
 const calcDisplaySummary = function (acc) {
   const incomes = acc.movements
     .filter(mov => mov > 0)
     .reduce((acc, mov) => acc + mov, 0);
-  labelSumIn.textContent = `${incomes.toFixed(2)}€`;
+  labelSumIn.textContent = `${formatCurr(acc.locale, acc.currency, incomes)}`;
 
   const out = acc.movements
     .filter(mov => mov < 0)
     .reduce((acc, mov) => acc + mov, 0);
-  labelSumOut.textContent = `${Math.abs(out).toFixed(2)}€`;
+  labelSumOut.textContent = `${formatCurr(acc.locale, acc.currency, Math.abs(out))}`;
 
   const interest = acc.movements
     .filter(mov => mov > 0)
@@ -184,7 +194,7 @@ const calcDisplaySummary = function (acc) {
       return int >= 1;
     })
     .reduce((acc, int) => acc + int, 0);
-  labelSumInterest.textContent = `${interest.toFixed(2)}€`;
+  labelSumInterest.textContent = `${formatCurr(acc.locale, acc.currency, interest)}`;
 };
 
 const createUsernames = function (accs) {
@@ -209,6 +219,36 @@ const updateUI = function (acc) {
   calcDisplaySummary(acc);
 };
 
+const logoutTimer = function () {
+  // 5 min
+  let time = 120
+
+  const tick = () => {
+    // calculate only the total FULL minutes so decimal points wil be cut off because those are the seconds and they will be calculated with the remainer calculation
+    const min = String(Math.trunc(time / 60)).padStart(2, '0')
+    // remainder of the time converted to string (those are the seconds)
+    const sec = String(time % 60).padStart(2, '0')
+
+    labelTimer.textContent = `${min}:${sec}`
+
+    // first check before decreasing
+    if (time === 0)  {
+      clearInterval(timer)
+      labelWelcome.textContent = `Log in to get started`;
+      containerApp.style.opacity = 0;
+    }
+
+    time--
+
+  }
+
+  tick()
+  const timer = setInterval(tick, 1000)
+
+  return timer
+}
+
+
 ///////////////////////////////////////
 // Event handlers
 btnLogin.addEventListener('click', function (e) {
@@ -228,13 +268,17 @@ btnLogin.addEventListener('click', function (e) {
     containerApp.style.opacity = 100;
 
     // add current time to label and locals
-    // labelDate.textContent = new Intl.DateTimeFormat(navigator.languege, options).format(currentDate)
-    labelDate.textContent = new Intl.DateTimeFormat(currentAccount.locale, options).format(currentDate)
+    // labelDate.textContent = new Intl.DateTimeFormat(navigator.languege, optionsDate).format(currentDate)
+    labelDate.textContent = new Intl.DateTimeFormat(currentAccount.locale, optionsDate).format(currentDate)
 
 
     // Clear input fields
     inputLoginUsername.value = inputLoginPin.value = '';
     inputLoginPin.blur();
+
+    // start timer
+    if (timer) clearInterval(timer)
+    timer = logoutTimer()
 
     // Update UI
     updateUI(currentAccount);
@@ -265,6 +309,10 @@ btnTransfer.addEventListener('click', function (e) {
 
     // Update UI
     updateUI(currentAccount);
+
+    // reset timer
+    clearInterval(timer)
+    timer = logoutTimer()
   }
 });
 
@@ -278,8 +326,14 @@ btnLoan.addEventListener('click', function (e) {
     currentAccount.movements.push(amount);
     currentAccount.movementsDates.push(currentDate.toISOString())
     
-    // Update UI
-    updateUI(currentAccount);
+    setTimeout(( ) => {
+      // Update UI
+      updateUI(currentAccount);
+    }, 2000)
+
+    // reset timer
+    clearInterval(timer)
+    timer = logoutTimer()
   }
   inputLoanAmount.value = '';
 });
@@ -348,16 +402,16 @@ btnSort.addEventListener('click', function (e) {
 // console.log(8 / 3); // is niet een geheel getal dus dan heb je een remainder
 
 // function to check if a number is odd or even
-const isEven = function(numb) {
-  if (numb % 2 === 0) {
-    console.log(`${numb} is even`);
-  } else {
-    console.log(`${numb} is odd`);
-  }
-}
+// const isEven = function(numb) {
+//   if (numb % 2 === 0) {
+//     console.log(`${numb} is even`);
+//   } else {
+//     console.log(`${numb} is odd`);
+//   }
+// }
 
-isEven(3)
-isEven(9)
+// isEven(3)
+// isEven(9)
 
 ///////////////////////////////////////
 // Working with BigInt
@@ -394,4 +448,19 @@ isEven(9)
 
 ///////////////////
 // Date
+
+/////////////////////////
+// settimout and interval
+
+// make timer (with dom element)
+// let time = 0
+// setInterval(() => {
+//   let now = new Date()
+//   let formatDate = new Intl.DateTimeFormat('en-GB', {hour: 'numeric', minute: 'numeric', second: 'numeric'}).format(now)
+
+//   document.querySelector('#time').textContent = `${formatDate}`
+//   console.log(formatDate);
+// }, 1000)
+
+
 
