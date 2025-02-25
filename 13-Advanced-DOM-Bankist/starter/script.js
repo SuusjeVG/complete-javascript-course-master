@@ -45,22 +45,7 @@ document.querySelector('.nav__links').addEventListener('click', function(e) {
   }
 })
 
-////////////////////
-// Tabbed component
-document.querySelector('.operations__tab-container').addEventListener('click', (e) => {
-  // console.log(e.target.getAttribute('data-tab'));
-  if(e.target.classList.contains('operations__tab')) {
-    const id = e.target.getAttribute('data-tab')
 
-    let selected = document.querySelector(`.operations__content--${id}`)
-    console.log(getComputedStyle(selected).display);
-    if (selected.classList.contains('.operations__tab--active')) {
-      getComputedStyle(selected).display = 'none'
-    } else {
-      getComputedStyle(selected).display = 'grid'
-    }
-  }
-})
 
 ///////////////////////////
 // Smooth scrolling button
@@ -80,6 +65,49 @@ btnScrollTo.addEventListener('click', function(e) {
   section1.scrollIntoView({ behavior: 'smooth'})
 })
 
+////////////////////
+// Tabbed component
+const $buttonTabs = document.querySelectorAll('.operations__tab')
+const $tabsContainer = document.querySelector('.operations__tab-container')
+const $tabsContent = document.querySelectorAll('.operations__content')
+
+$tabsContainer.addEventListener('click', (e) => {
+  const clicked = e.target.closest('.operations__tab')
+
+  // if something else is clicked wich doesn't have the operations tab as clossest (guard clause)
+  if (!clicked) return
+
+  // remove active classes
+  $buttonTabs.forEach(e => e.classList.remove('operations__tab--active'))
+  $tabsContent.forEach(e => e.classList.remove('operations__content--active'))
+
+  // Add active tab
+  clicked.classList.add('operations__tab--active')
+
+  // content find  by data attribute and add the active class
+  const id = clicked.getAttribute('data-tab') // clicked.dataSet.tab also possible
+  let selected = document.querySelector(`.operations__content--${id}`)
+  selected.classList.add('operations__content--active')
+})
+
+// Menu fade
+const $navLinksContainer = document.querySelector('.nav__links')
+const $navLinks = document.querySelectorAll('.nav__item')
+
+$navLinksContainer.addEventListener('mouseover', function (e) {
+  const hovered = e.target.closest('.nav__item');
+
+  if (!hovered) return
+  // console.log(hovered);
+  // $navLinks.forEach(e => e === hovered ? hovered.style.opacity = '1' : e.style.opacity = '0.5')
+  $navLinks.forEach(e => {
+    if (e !== hovered) e.style.opacity = '0.5';
+  });
+})
+
+$navLinksContainer.addEventListener('mouseout', function (e) {
+  $navLinks.forEach(e => e.style.opacity = '1')
+})
 
 /************
  * Practices
