@@ -109,6 +109,117 @@ $navLinksContainer.addEventListener('mouseout', function (e) {
   $navLinks.forEach(e => e.style.opacity = '1')
 })
 
+/////////////////////////
+// sitkcy nav
+// Bad for performance because it's running all the time when you scroll.
+// s1coords.top possible
+// const s1coords = section1.getBoundingClientRect();
+// // headerCoords.bottom is possible
+// const $header = document.querySelector('.header')
+// const headerCoords = $header.getBoundingClientRect()
+// const $nav = document.querySelector('.nav')
+
+// // don't put the coords variable in the scroll event because then the value will always change when you scroll. Because it will check from the top of the viewport and when you scroll it will get more or less.
+// window.addEventListener('scroll', () => {
+
+//   if (window.scrollY > headerCoords.bottom) {
+//     $nav.classList.add('sticky') 
+//   } else {
+//     $nav.classList.remove('sticky') 
+//   }
+//   console.log(window.scrollY);
+// })
+
+const $header = document.querySelector('.header')
+const $nav = document.querySelector('.nav')
+const navCoords = $nav.getBoundingClientRect()
+
+// With intersection API
+const obsOptions = {
+  root: null, // whole viewport
+  threshold: 0,
+  rootMargin: -navCoords.height + 'px'// activate 90px before the threshold
+}
+
+// observer parameter is only if you want to stop observing. in this case we will not
+const observerHeader = new IntersectionObserver((entries) => {
+  const [entry] = entries
+
+  if (!entry.isIntersecting) $nav.classList.add('sticky')  
+  else $nav.classList.remove('sticky') 
+
+}, obsOptions)
+
+// observe the element
+observerHeader.observe($header)
+
+////////////////////////////
+// load sections on scroll
+const allSections = document.querySelectorAll('section')
+const obsOptions2 = {
+  root: null, // whole viewport
+  threshold: 0.1,
+}
+
+const sectionObserver = new IntersectionObserver((entries, observer) => {
+  // because this observer is used for multple sections it has an array with more elements then 1 so use the foreach loop instead of destructering because of bugg
+  entries.forEach( (section) => {
+    // also possible
+    // if(!entry.isIntersecting) return
+
+    if (section.isIntersecting) {
+      section.target.classList.remove('section--hidden')
+
+      // if class is added to target stop observering that target 
+      observer.unobserve(section.target)
+    }
+  })
+}, obsOptions2)
+
+allSections.forEach((section) => {
+  section.classList.add('section--hidden')
+  sectionObserver.observe(section)
+})
+
+//////////////////////
+// lazy loading
+const lazyImages = document.querySelectorAll('img[data-src]')
+
+const obsOptions3 = {
+  root: null,
+  threshold: 0,
+  rootMargin: '200px'
+}
+
+const imageObserver = new IntersectionObserver((entries, observer) => { 
+  // console.log(entries);
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return
+
+    entry.target.src = entry.target.dataset.src
+
+    // remove blur after image is loaded otherwist you get a blurred image.
+    entry.target.addEventListener('load', function() {
+      entry.target.classList.remove('lazy-img')
+    })
+    observer.unobserve(entry.target)
+  })
+}, obsOptions3);
+
+lazyImages.forEach(image => {
+  imageObserver.observe(image)
+})
+
+/////////////////
+// slider
+const $slides = document.querySelectorAll('.slider .slide')
+
+$slides.forEach((slide, i) => {
+  slide.sty
+  console.log(slide);
+})
+console.log($slides);
+
 /************
  * Practices
 */
