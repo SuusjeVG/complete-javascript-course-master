@@ -212,13 +212,101 @@ lazyImages.forEach(image => {
 
 /////////////////
 // slider
-const $slides = document.querySelectorAll('.slider .slide')
+const slider = function () {
+  // const $sliderContainer = document.querySelector('.slider')
+  const $slides = document.querySelectorAll('.slider .slide')
+  
+  const btnLeft = document.querySelector('.slider__btn--left')
+  const btnRight = document.querySelector('.slider__btn--right')
+  
+  let currentSlide = 0
+  const totalSlides = $slides.length -1
+  
+  // functions
+  // slider part 2
+  const dotsContainer = document.querySelector('.dots')
+  
+  const createDots = function() {
+    $slides.forEach((_, i) => {
+      let html = `<div class="dots__dot" data-slide='${i}'></div>`
+      dotsContainer.insertAdjacentHTML('beforeend', html)
+    });
+  }
+  
+  const activeDot = function(currSlide) {
+    document.querySelectorAll('.dots__dot').forEach((item, i) => {
+      item.classList.remove('dots__dot--active')
+    })
+  
+    // search based on data-attribute wich is passed in as parameter
+    document.querySelector(`.dots__dot[data-slide="${currSlide}"]`)
+    .classList.add('dots__dot--active');
+  }
+  
+  // event delegation
+  dotsContainer.addEventListener('click', function(e) {
+    if (e.target.classList.contains('dots__dot')) {
+      const id = Number(e.target.dataset.slide)
+      goToSlide(id)
+      activeDot(id)
+    }
+  })
+  
+  // part 1
+  const goToSlide = function(slide) {
+    $slides.forEach((s, i) => {
+      s.style.transform = `translateX(${(i - slide) * 100}%)`
+    })
+  }
+  
+  // Next slide
+  const nextSlide = function() {
+    if (currentSlide === totalSlides) {
+      currentSlide = 0
+    } else {
+      currentSlide++
+    }
+  
+    goToSlide(currentSlide)
+    activeDot(currentSlide)
+  }
+  
+  // prev slide
+  const prevSlide = function() {
+    // if (currentSlide > 0) currentSlide--
+    if(currentSlide === 0) {
+      currentSlide = totalSlides
+    } else {
+      currentSlide--
+    }
+  
+    goToSlide(currentSlide)
+    activeDot(currentSlide)
+  }
+  
+  const init = function() {
+    goToSlide(0)
+    createDots()
+    activeDot(0)
+  }
+  
+  init()
+  
+  // Event handlers
+  // mouse
+  btnRight.addEventListener('click', nextSlide)
+  btnLeft.addEventListener('click', prevSlide)
+  //keyboard scroll
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'ArrowRight') nextSlide()
+    if(e.key === 'ArrowLeft') prevSlide()
+  })
 
-$slides.forEach((slide, i) => {
-  slide.sty
-  console.log(slide);
-})
-console.log($slides);
+}
+
+slider()
+
+
 
 /************
  * Practices
