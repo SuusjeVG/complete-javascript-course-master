@@ -182,50 +182,125 @@ GOOD LUCK 😀
 */
 
 // code from last challenge
-const Car = function(make, speed) {
-    this.make = make;
-    this.speed = speed;
+// const Car = function(make, speed) {
+//     this.make = make;
+//     this.speed = speed;
+// }
+// Car.prototype.accelerate = function() {
+//     this.speed += 10
+//     console.log(`The ${this.make} new speed is ${this.speed} km/h`)
+// }
+
+// Car.prototype.brake = function() {
+//     this.speed -= 5
+//     console.log(`The ${this.make} new speed is ${this.speed} km/h`);
+// }
+
+// // 1. 
+// const EV = function(make, speed, charge) {
+//     Car.call(this, make, speed)
+//     this.charge = charge;
+// }
+
+// // link the prototype
+// EV.prototype = Object.create(Car.prototype)
+
+// // 2.
+// EV.prototype.chargeBattery = function(chargeTo) {
+//     this.charge = chargeTo
+// };
+
+// // tesla.chargeBattery(50)
+// // console.log(tesla);
+
+// // 3.
+// EV.prototype.accelerate = function() {
+//     this.speed += 20
+//     this.charge--
+//     console.log(`${this.make} going at ${this.speed} km/h, with a charge of ${this.charge}%`)
+// }
+
+// // 4.
+// const tesla = new EV('Tesla', 120, 23)
+// tesla.chargeBattery(90)
+// // console.log(tesla);
+// tesla.brake()
+// tesla.accelerate()
+
+///////////////////////////////////////
+// Coding Challenge #4
+
+/* 
+1. Re-create challenge #3, but this time using ES6 classes: create an 'EVCl' child class of the 'CarCl' class
+2. Make the 'charge' property private;
+3. Implement the ability to chain the 'accelerate' and 'chargeBattery' methods of this class, and also update the 'brake' method in the 'CarCl' class. They experiment with chining!
+
+DATA CAR 1: 'Rivian' going at 120 km/h, with a charge of 23%
+
+GOOD LUCK 😀
+*/
+
+class Car {
+    constructor(make, speed) {
+        this.make = make;
+        this.speed = speed;
+    }
+
+    accelerate() {
+        this.speed += 10;
+        console.log(`The ${this.make} new speed is ${this.speed} km/h`)
+    }
+
+    brake() {
+        this.speed -= 5;
+        console.log(`The ${this.make} new speed is ${this.speed} km/h`)
+        return this
+    }
+
+    get speedUS() {
+        return this.speed / 1.6
+    }
+
+    set speedUS(speed) {
+        this.speed = speed * 1.6;
+    }
 }
-Car.prototype.accelerate = function() {
-    this.speed += 10
-    console.log(`The ${this.make} new speed is ${this.speed} km/h`)
+
+// 1.
+class EV extends Car {
+    // 2.
+    #charge;
+
+    constructor(make, speed, charge) {
+        super(make, speed)
+
+        this.#charge = charge;
+        // console.log('hello', this);
+    }
+
+    chargeBattery(chargeTo) {
+        this.#charge = chargeTo
+        return this
+    }
+
+    accelerate() {
+        this.speed += 20
+        this.#charge--
+        console.log(`${this.make} going at ${this.speed} km/h, with a charge of ${this.#charge}%`)
+        return this
+    }
+
 }
 
-Car.prototype.brake = function() {
-    this.speed -= 5
-    console.log(`The ${this.make} new speed is ${this.speed} km/h`);
-}
+const rivian = new EV('Rivian', 120, 23)
 
-// 1. 
-const EV = function(make, speed, charge) {
-    Car.call(this, make, speed)
-    this.charge = charge;
-}
-
-// link the prototype
-EV.prototype = Object.create(Car.prototype)
-
-// 2.
-EV.prototype.chargeBattery = function(chargeTo) {
-    this.charge = chargeTo
-};
-
-// tesla.chargeBattery(50)
-// console.log(tesla);
-
-// 3.
-EV.prototype.accelerate = function() {
-    this.speed += 20
-    this.charge--
-    console.log(`${this.make} going at ${this.speed} km/h, with a charge of ${this.charge}%`)
-}
-
-// 4.
-const tesla = new EV('Tesla', 120, 23)
-tesla.chargeBattery(90)
-// console.log(tesla);
-tesla.brake()
-tesla.accelerate()
-
-
-
+// 3. method chaining
+// all the methods wich set something can chain
+rivian
+    .chargeBattery(90)
+    .accelerate()
+    .brake()
+    .accelerate()
+    .accelerate()
+    .chargeBattery(100)
+console.log(rivian);
