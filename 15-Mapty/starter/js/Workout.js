@@ -3,6 +3,7 @@
 export default class Workout {
     id = (Date.now() + '').slice(-10)
     date = new Date()
+    clicks = 0;
 
     constructor(coords, distance, duration) {
         this.coords = coords; // [lat, lng]
@@ -17,5 +18,9 @@ export default class Workout {
         this.discription = `${this.type[0].toUpperCase() + this.type.slice(1)} on ${months[this.date.getMonth()]} ${this.date.getDate()}`
 
         return this.discription
+    }
+
+    _click() {
+        this.clicks++
     }
 }
