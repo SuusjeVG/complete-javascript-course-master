@@ -15,12 +15,12 @@ const deleteAllButton = document.querySelector('.delete__all');
 
 export default class App {
     #map;
-    #mapZoomLevel = 13
+    #mapZoomLevel = 13;
     #mapEvent;
-    #workouts = []
+    #workouts = [];
     #editWorkout = null;
     #markersGroup;
-    $overlay = '<div class="overlay"></div>'
+    $overlay = '<div class="overlay"></div>';
 
     constructor() {
         // get users position and load map
