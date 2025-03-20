@@ -221,25 +221,187 @@ const getCountryDataAndNeighbour = function(country) {
 const getJSONLocation = function(url, errorMessage = 'Something went wrong') {
     return fetch(url)
         .then(response =>  {
-            if (!response.ok) throw new Error(`${errorMessage}, status ${response.status}`);
+            console.log(response);
+            if (!response.ok) throw new Error(`${errorMessage}, status ${response.status} ❌❌`);
             
             return response.json()
         })
 }
 
-const whereAmI = function(lat, lng) {
-    getJSONLocation(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}`, 'Could not fetch location data')
-        .then(data => {
-            console.log(data);
-            return getCountryDataAndNeighbour(data.countryName)
-        })
-        .catch(err => { 
-            console.error(`Something went wrong! ${err.message}`);
-            errorMessage(`Sorry could not find your location, ${err.message}, try again`) ;
-        })
-        .finally(() => countriesContainer.style.opacity = 1)
+// const whereAmI = function(lat, lng) {
+//     getJSONLocation(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}`, 'Could not fetch location data')
+//         .then(data => {
+//             console.log(`You are in ${data.city}, ${data.countryName}`)
+//             return getCountryDataAndNeighbour(data.countryName)
+//         })
+//         .catch(err => { 
+//             // console.dir(err)
+//             console.error(`Something went wrong! ${err.message} 😥`);
+//             errorMessage(`Sorry could not find your location, ${err.message}, try again`) ;
+//         })
+//         .finally(() => countriesContainer.style.opacity = 1)
+// }
+
+// btn.addEventListener('click', () => {
+//     whereAmI(52.508, 13.381)
+// })
+
+///////////////////////////////////////
+// The Event Loop in Practice
+// console.log('Test start');
+// setTimeout(() => console.log('0 sec timer'), 0);
+// Promise.resolve('Resolved promise 1').then(res => console.log(res));
+
+// Promise.resolve('Resolved promise 2').then(res => {
+//     for (let i = 0; i < 1000000000; i++) {}
+//     console.log(res);
+//   });
+
+// console.log('Test end');
+
+/*  MY ANSWER:
+    first: Test start (sync task first, is in the callstack)
+    second: Test end (sync task first, is in the callstack)
+    third: Resolved promise 1 (async but goes in microtasks queue because it's a promise)
+    fourth: 0 sec timer (async but goes in callback queue but micro queue is always first)
+*/
+
+
+///////////////////////////////
+// PROMISES
+
+// const lotteryPromise = new Promise(function(resolve, reject) {
+    
+//     setTimeout(() => {
+//         if (Math.random() >= 0.5) {
+//             resolve({ price: 120000, status: 'You win the lottery', win: true})
+//         } else {
+//             reject(new Error(`You lost all your money`))
+//         }
+//     }, 2000);
+
+// })
+
+// lotteryPromise
+//     .then(res => console.log(`${res.status}, win = ${res.win}`))
+//     .catch(err => console.error(err))
+
+/////////////////////////
+// Promis geolocation
+// navigator.geolocation.getCurrentPosition( 
+//     (pos) => {console.log(pos);},
+//     (err) => {console.log(err);},
+//     {}
+// )
+
+// const getGeoLocation = function() {
+//     return new Promise(function(resolve, reject) {
+//         // navigator.geolocation.getCurrentPosition( 
+//         //     (pos) => {resolve(pos);},
+//         //     (err) => {reject(err);}
+//         // )
+//         navigator.geolocation.getCurrentPosition(resolve, reject)
+//     })
+// }
+
+// // getGeoLocation().then(data => console.log(data))
+// const whereAmI = function() {
+//     getGeoLocation()
+//         .then(location => {
+//             const {latitude: lat, longitude: lng} = location.coords
+
+//             getJSONLocation(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}`, 'Could not fetch location data')
+//         .then(data => {
+//             console.log(`You are in ${data.city}, ${data.countryName}`)
+//             return getCountryDataAndNeighbour(data.countryName.split(" ")[0])
+//         })
+//         .catch(err => { 
+//             // console.dir(err)
+//             console.error(`Something went wrong! ${err.message} 😥`);
+//             errorMessage(`Sorry could not find your location, ${err.message}, try again`) ;
+//         })
+//         .finally(() => countriesContainer.style.opacity = 1)
+//     })
+// }
+
+// whereAmI()
+
+///////////////////////////////////////
+// Coding Challenge #2
+
+/* 
+Build the image loading functionality that I just showed you on the screen.
+
+Tasks are not super-descriptive this time, so that you can figure out some stuff on your own. Pretend you're working on your own 😉
+
+PART 1
+1. Create a function 'createImage' which receives imgPath as an input. This function returns a promise which creates a new image (use document.createElement('img')) and sets the .src attribute to the provided image path. When the image is done loading, append it to the DOM element with the 'images' class, and resolve the promise. The fulfilled value should be the image element itself. In case there is an error loading the image ('error' event), reject the promise.
+
+If this part is too tricky for you, just watch the first part of the solution.
+
+PART 2
+2. Comsume the promise using .then and also add an error handler;
+3. After the image has loaded, pause execution for 2 seconds using the wait function we created earlier;
+4. After the 2 seconds have passed, hide the current image (set display to 'none'), and load a second image (HINT: Use the image element returned by the createImage promise to hide the current image. You will need a global variable for that 😉);
+5. After the second image has loaded, pause execution for 2 seconds again;
+6. After the 2 seconds have passed, hide the current image.
+
+TEST DATA: Images in the img folder. Test the error handler by passing a wrong image path. Set the network speed to 'Fast 3G' in the dev tools Network tab, otherwise images load too fast.
+
+GOOD LUCK 😀
+*/
+const wait = function(seconds) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, seconds * 1000);
+    })
 }
 
-btn.addEventListener('click', () => {
-    whereAmI(52.508, 13.381)
-})
+const imageContainer = document.querySelector('.images')
+
+const createImage = function(imgPath) {
+    return new Promise((resolve, reject) => {
+        const img = document.createElement('img')
+        img.src = imgPath
+
+        img.addEventListener('load', function() {
+            imageContainer.appendChild(this)
+            resolve(img)
+        })
+
+        img.addEventListener('error', function() {
+            reject(new Error('Image not loaded'))
+        })
+    })
+}
+
+let currentImage;
+
+createImage('./img/img-1.jpg')
+    .then(img =>  {
+        currentImage = img
+        console.log('image is loaded')
+        return wait(2)
+    })
+    .then(() => {
+        currentImage.style.display = 'none'
+        return wait(2)
+    })
+    .then(() => {
+        currentImage.style.display = 'block'
+        createImage('./img/img-2.jpg')
+        return wait(2)
+    })
+    .then(() => {
+        currentImage.style.display = 'none'
+        return wait(2)
+    })
+    .then(() => {
+        currentImage.style.display = 'block'
+        createImage('./img/img-3.jpg')
+        return wait(2)
+    })
+    .then(() => {
+        currentImage.style.display = 'none'
+        return wait(2)
+    })
+    .catch(err => console.error(err))
