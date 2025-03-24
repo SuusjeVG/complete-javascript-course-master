@@ -1,10 +1,10 @@
 import Running from "./Running.js";
 import Cycling from "./Cycling.js";
-import Marker from "./Marker.js"
+// import Marker from "./Marker.js"
 
 const errorPopup = document.querySelector('.error__validation__popup')
-const mapDOM = document.querySelector('#map');
 const form = document.querySelector('.form');
+const sortOptions = document.querySelector('#sort__options')
 const containerWorkouts = document.querySelector('.workouts');
 const inputType = document.querySelector('.form__input--type');
 const inputDistance = document.querySelector('.form__input--distance');
@@ -31,6 +31,9 @@ export default class App {
 
         // Attach event handlers 
         inputType.addEventListener('change', this._toggleElevationField)
+
+        // Filter
+        sortOptions.addEventListener('change', this._sort.bind(this)) 
 
         // Create, edit, delete workout
         form.addEventListener('submit', this._newWorkout.bind(this))
@@ -81,10 +84,17 @@ export default class App {
         // })
     }
 
+    // only on click map (not when editing)
     _showForm(e) {
+        inputType.disabled = false;
+        inputDistance.value = inputDuration.value = inputCadence.value = inputElevation.value = '';      
         this.#mapEvent = e
         form.classList.remove('hidden')
         inputDistance.focus()
+
+        // if you were editing a workout
+        this.#editWorkout = null;
+        document.querySelectorAll('.workout').forEach(el => el.classList.remove('current__workout'));
     }
 
     _hideForm() {
@@ -99,91 +109,123 @@ export default class App {
         inputElevation.closest('.form__row').classList.toggle('form__row--hidden')
     }
 
-    _newWorkout(e) {
-        // Helper functions (Check how you write the function and that you return it)
-        const validate = (...inputs) => inputs.every( inp => Number.isFinite(inp));
-        const allPositive = (...inputs) => inputs.every( inp => inp > 0 );
+    _createNewWorkout() {
+         // Helper functions (Check how you write the function and that you return it)
+         const validate = (...inputs) => inputs.every( inp => Number.isFinite(inp));
+         const allPositive = (...inputs) => inputs.every( inp => inp > 0 );
+ 
+         // map event data 
+         const {lat, lng} = this.#mapEvent.latlng
+         const coords = [lat, lng]
+         //get the input data
+         const type = inputType.value;
+         const distance = +inputDistance.value;
+         const duration = +inputDuration.value;
+         let workout;
+         
+         // if workout is running create new object
+         if (type === 'running') {
+             const cadence = +inputCadence.value;
+ 
+             // check if data is valid
+             if (!validate(distance, duration, cadence) || !allPositive(distance, duration, cadence) ) {
+                 this._hideForm()
+ 
+                 document.body.insertAdjacentHTML('beforebegin', this.$overlay)
+                 errorPopup.classList.add('show');
+                 document.querySelector('.confirm').addEventListener('click', () =>  {
+                     errorPopup.classList.remove('show')
+                     document.querySelector('.overlay').remove()
+                 });
 
-        // prevent reloading
-        e.preventDefault();
+                 return // alert(`The input has to be positive numbers`)
+             }
+ 
+             // Create new object and push in the workout array
+             workout = new Running(coords, distance, duration, cadence)
+         }
+ 
+         // if workout is cycling creat new Object
+         if (type === 'cycling') {
+             const elevation = +inputElevation.value;
+ 
+             // check if data is valid
+             if (!validate(distance, duration, elevation) || !allPositive(distance, duration)) {
+                 this._hideForm()
+ 
+                 document.body.insertAdjacentHTML('beforebegin', this.$overlay)
+                 errorPopup.classList.add('show');
+                 document.querySelector('.confirm').addEventListener('click', () =>  {
+                     errorPopup.classList.remove('show')
+                     document.querySelector('.overlay').remove()
+                 });
 
-        // map event data 
-        const {lat, lng} = this.#mapEvent.latlng
-        const coords = [lat, lng]
-        //get the input data
-        const type = inputType.value;
-        const distance = +inputDistance.value;
-        const duration = +inputDuration.value;
-        let workout;
-        
-        // if workout is running create new object
-        if (type === 'running') {
-            const cadence = +inputCadence.value;
+                 return // alert(`The input has to be positive numbers`)
+             }
+ 
+             workout = new Cycling(coords, distance, duration, elevation)
+         }
 
-            // check if data is valid
-            if (!validate(distance, duration, cadence) || !allPositive(distance, duration, cadence) ) {
-                this._hideForm()
-
-                document.body.insertAdjacentHTML('beforebegin', this.$overlay)
-                errorPopup.classList.add('show');
-                document.querySelector('.confirm').addEventListener('click', () =>  {
-                    errorPopup.classList.remove('show')
-                    document.querySelector('.overlay').remove()
-                });
-                return // alert(`The input has to be positive numbers`)
-            }
-
-            // Create new object and push in the workout array
-            workout = new Running(coords, distance, duration, cadence)
-        }
-
-        // if workout is cycling creat new Object
-        if (type === 'cycling') {
-            const elevation = +inputElevation.value;
-
-            // check if data is valid
-            if (!validate(distance, duration, elevation) || !allPositive(distance, duration)) {
-                this._hideForm()
-
-                document.body.insertAdjacentHTML('beforebegin', this.$overlay)
-                errorPopup.classList.add('show');
-                document.querySelector('.confirm').addEventListener('click', () =>  {
-                    errorPopup.classList.remove('show')
-                    document.querySelector('.overlay').remove()
-                });
-                return // alert(`The input has to be positive numbers`)
-            }
-
-            workout = new Cycling(coords, distance, duration, elevation)
-        }
-
-        if (this.#editWorkout) {
-            this.#editWorkout.distance = distance;
-            this.#editWorkout.duration = duration;
-            if (this.#editWorkout.type === 'running') this.#editWorkout.cadence = inputCadence.value;
-            if (this.#editWorkout.type === 'cycling') this.#editWorkout.elevationGain = inputElevation.value;
-
-            // delete current styling
-            document.querySelectorAll('.workout').forEach(el => el.classList.remove('current__workout'));
-
-
-        } else {
-            this.#workouts.push(workout);
-            this._renderWorkout(workout);
-            // Render new object as marker
-            // const marker = new Marker(this.#map, workout)
-            this._renderWorkoutMarker(workout)
-        }
-
-         // Reset edit-modus
-        this.#editWorkout = null
-
-        // clear the input fields and hide the form
-        this._hideForm()
+         this.#workouts.push(workout);
+         this._renderWorkout(workout);
+         this._renderWorkoutMarker(workout)
 
         // Set local storage to all added workouts
         // this._setLocalStorage()
     }
+    
+    _updateWorkout() {
+        const htmlElement = document.querySelector(`.workout[data-id="${this.#editWorkout.id}"]`);
+
+        if (htmlElement) {  
+            // set object values
+            this.#editWorkout.distance =  +inputDistance.value;
+            this.#editWorkout.duration = +inputDuration.value;
+
+            if (this.#editWorkout.type === 'running') {
+                this.#editWorkout.calcPace() 
+                this.#editWorkout.cadence = +inputCadence.value;
+                
+                // set UI element values
+                document.querySelector('.pace__value').textContent = this.#editWorkout.pace;
+                document.querySelector('.cadence__value').textContent = this.#editWorkout.cadence;
+            }
+
+            if (this.#editWorkout.type === 'cycling') {
+                this.#editWorkout.calcSpeed() 
+                this.#editWorkout.elevationGain = +inputElevation.value;
+
+                // set UI element values
+                document.querySelector('.speed__value').textContent = this.#editWorkout.speed;
+                document.querySelector('.elevation__value').textContent = this.#editWorkout.elevationGain;
+            }
+            
+
+            // set UI element values
+            document.querySelector('.distance__value').textContent = this.#editWorkout.distance 
+            document.querySelector('.duration__value').textContent = this.#editWorkout.duration
+
+            // delete current styling
+            document.querySelectorAll('.workout').forEach(el => el.classList.remove('current__workout'));
+        }
+
+        this.#editWorkout = null
+        inputType.disabled = false;
+    }
+
+    _newWorkout(e) {
+        e.preventDefault();
+        const isEditing = !!this.#editWorkout;
+    
+        if (isEditing) {
+            this._updateWorkout();
+        } else {
+            this._createNewWorkout();
+        }
+    
+        this._hideForm();
+    }
+
 
     _renderWorkoutMarker(workout) {
         const marker = L.marker(workout.coords)
@@ -212,12 +254,12 @@ export default class App {
                 <h2 class="workout__title"> ${workout.discription}</h2>
                 <div class="workout__details">
                     <span class="workout__icon">${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'}</span>
-                    <span class="workout__value">${workout.distance}</span>
+                    <span class="workout__value distance__value">${workout.distance}</span>
                     <span class="workout__unit">km</span>
                 </div>
                 <div class="workout__details">
                     <span class="workout__icon">⏱</span>
-                    <span class="workout__value">${workout.duration}</span>
+                    <span class="workout__value duration__value">${workout.duration}</span>
                     <span class="workout__unit">min</span>
                 </div>
 
@@ -226,12 +268,12 @@ export default class App {
             html += `
                     <div class="workout__details">
                         <span class="workout__icon">⚡️</span>
-                        <span class="workout__value">${workout.pace.toFixed(1)}</span>
+                        <span class="workout__value pace__value">${workout.pace.toFixed(1)}</span>
                         <span class="workout__unit">min/km</span>
                     </div>
                     <div class="workout__details">
                         <span class="workout__icon">🦶🏼</span>
-                        <span class="workout__value">${workout.cadence}</span>
+                        <span class="workout__value cadence__value">${workout.cadence}</span>
                         <span class="workout__unit">spm</span>
                     </div>
                 </li>
@@ -242,12 +284,12 @@ export default class App {
             html += `
                     <div class="workout__details">
                         <span class="workout__icon">⚡️</span>
-                        <span class="workout__value">${workout.speed.toFixed(1)}</span>
+                        <span class="workout__value speed__value">${workout.speed.toFixed(1)}</span>
                         <span class="workout__unit">min/km</span>
                     </div>
                     <div class="workout__details">
                         <span class="workout__icon">⛰</span>
-                        <span class="workout__value">${workout.elevationGain}</span>
+                        <span class="workout__value elevation__value">${workout.elevationGain}</span>
                         <span class="workout__unit">m</span>
                     </div>
                 </li>
@@ -255,13 +297,18 @@ export default class App {
         }
 
 
-        form.insertAdjacentHTML('afterend', html)
+        containerWorkouts.insertAdjacentHTML('afterbegin', html)
     }
+
+
 
     _editWorkout(e) {
         const clicked = e.target.closest('.edit__workout')
 
         if (!clicked) return;
+
+        // can't change type of workout when editing
+        inputType.disabled = true;
 
         // delete current styling
         document.querySelectorAll('.workout').forEach(el => el.classList.remove('current__workout'));
@@ -277,14 +324,17 @@ export default class App {
         this.#editWorkout = currentWorkout;
 
         // set values to current
-        inputType.value = currentWorkout.type
+        // inputType.value = currentWorkout.type
         inputDistance.value =currentWorkout.distance 
         inputDuration.value =currentWorkout.duration
-        if(currentWorkout.type === 'running') inputCadence.value =currentWorkout.cadence
+        if(currentWorkout.type === 'running') inputCadence.value = currentWorkout.cadence
         if(currentWorkout.type === 'cycling') inputElevation.value =currentWorkout.elevationGain
 
+        // show form with current values
         form.classList.remove('hidden')
         inputDistance.focus()
+
+        console.log(this.#workouts);
     }
 
     _deleteWorkout(e) {
@@ -360,4 +410,105 @@ export default class App {
             location.reload()
         }
     }
+
+    _sort() {
+        // if workouts array is not empty
+        if (this.#workouts.length > 0) {
+
+            if(sortOptions.value === 'date-new') this.#workouts.sort((a, b) => a.id - b.id) 
+            if(sortOptions.value === 'date-old') this.#workouts.sort((a, b) => b.id - a.id)
+                    
+            if(sortOptions.value === 'distance') this.#workouts.sort( (a, b) => a.distance - b.distance)    
+            if(sortOptions.value === 'duration') this.#workouts.sort( (a, b) => a.duration - b.duration)
+
+            
+            containerWorkouts.innerHTML = ''
+            this.#workouts.forEach(work => this._renderWorkout(work) )
+            
+        }
+    }
 }
+
+    // _newWorkout(e) {
+    //     // Helper functions (Check how you write the function and that you return it)
+    //     const validate = (...inputs) => inputs.every( inp => Number.isFinite(inp));
+    //     const allPositive = (...inputs) => inputs.every( inp => inp > 0 );
+
+    //     // prevent reloading
+    //     e.preventDefault();
+
+    //     // map event data 
+    //     const {lat, lng} = this.#mapEvent.latlng
+    //     const coords = [lat, lng]
+    //     //get the input data
+    //     const type = inputType.value;
+    //     const distance = +inputDistance.value;
+    //     const duration = +inputDuration.value;
+    //     let workout;
+        
+    //     // if workout is running create new object
+    //     if (type === 'running') {
+    //         const cadence = +inputCadence.value;
+
+    //         // check if data is valid
+    //         if (!validate(distance, duration, cadence) || !allPositive(distance, duration, cadence) ) {
+    //             this._hideForm()
+
+    //             document.body.insertAdjacentHTML('beforebegin', this.$overlay)
+    //             errorPopup.classList.add('show');
+    //             document.querySelector('.confirm').addEventListener('click', () =>  {
+    //                 errorPopup.classList.remove('show')
+    //                 document.querySelector('.overlay').remove()
+    //             });
+    //             return // alert(`The input has to be positive numbers`)
+    //         }
+
+    //         // Create new object and push in the workout array
+    //         workout = new Running(coords, distance, duration, cadence)
+    //     }
+
+    //     // if workout is cycling creat new Object
+    //     if (type === 'cycling') {
+    //         const elevation = +inputElevation.value;
+
+    //         // check if data is valid
+    //         if (!validate(distance, duration, elevation) || !allPositive(distance, duration)) {
+    //             this._hideForm()
+
+    //             document.body.insertAdjacentHTML('beforebegin', this.$overlay)
+    //             errorPopup.classList.add('show');
+    //             document.querySelector('.confirm').addEventListener('click', () =>  {
+    //                 errorPopup.classList.remove('show')
+    //                 document.querySelector('.overlay').remove()
+    //             });
+    //             return // alert(`The input has to be positive numbers`)
+    //         }
+
+    //         workout = new Cycling(coords, distance, duration, elevation)
+    //     }
+
+    //     if (this.#editWorkout) {
+    //         this.#editWorkout.distance = distance;
+    //         this.#editWorkout.duration = duration;
+    //         if (this.#editWorkout.type === 'running') this.#editWorkout.cadence = inputCadence.value;
+    //         if (this.#editWorkout.type === 'cycling') this.#editWorkout.elevationGain = inputElevation.value;
+    //         // delete current styling
+    //         document.querySelectorAll('.workout').forEach(el => el.classList.remove('current__workout'));
+
+    //     } else {
+        //     this.#workouts.push(workout);
+        //     this._renderWorkout(workout);
+        //     this._renderWorkoutMarker(workout)
+    //     }
+
+
+
+    //      // Reset edit-modus
+    //     this.#editWorkout = null
+
+    //     // clear the input fields and hide the form
+    //     this._hideForm()
+
+    //     // Set local storage to all added workouts
+    //     // this._setLocalStorage()
+    // }

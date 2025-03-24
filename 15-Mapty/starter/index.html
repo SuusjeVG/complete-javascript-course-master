@@ -26,43 +26,58 @@
   <body>
     <div class="sidebar">
       <img src="logo.png" alt="Logo" class="logo" />
+      
+      <div class="sort">
+        <label for=""> Sort by: </label>
+        <select name="sort" id="sort__options">
+          <option value="date-new"> Date newest! 📅</option>
+          <option value="date-old"> Date oldest! 📅</option>
+          <!-- <option value="running"> Running 🏃‍♂️‍➡️</option>
+          <option value="cycling"> Cycling 🚴</option> -->
+          <option value="distance"> Distance 🛣️</option>
+          <option value="duration"> Duration 🕜</option>
+          <!-- <option value="pace"> Pace ⚡</option>
+          <option value="speed"> Speed ⚡</option> -->
+        </select>
+      </div>
 
+      <form class="form hidden">
+        <div class="form__row">
+          <label class="form__label">Type</label>
+          <select class="form__input form__input--type">
+            <option value="running">Running</option>
+            <option value="cycling">Cycling</option>
+          </select>
+        </div>
+        <div class="form__row">
+          <label class="form__label">Distance</label>
+          <input class="form__input form__input--distance" placeholder="km" />
+        </div>
+        <div class="form__row">
+          <label class="form__label">Duration</label>
+          <input
+            class="form__input form__input--duration"
+            placeholder="min"
+          />
+        </div>
+        <div class="form__row">
+          <label class="form__label">Cadence</label>
+          <input
+            class="form__input form__input--cadence"
+            placeholder="step/min"
+          />
+        </div>
+        <div class="form__row form__row--hidden">
+          <label class="form__label">Elev Gain</label>
+          <input
+            class="form__input form__input--elevation"
+            placeholder="meters"
+          />
+        </div>
+        <button class="form__btn">OK</button>
+      </form>
+      
       <ul class="workouts">
-        <form class="form hidden">
-          <div class="form__row">
-            <label class="form__label">Type</label>
-            <select class="form__input form__input--type">
-              <option value="running">Running</option>
-              <option value="cycling">Cycling</option>
-            </select>
-          </div>
-          <div class="form__row">
-            <label class="form__label">Distance</label>
-            <input class="form__input form__input--distance" placeholder="km" />
-          </div>
-          <div class="form__row">
-            <label class="form__label">Duration</label>
-            <input
-              class="form__input form__input--duration"
-              placeholder="min"
-            />
-          </div>
-          <div class="form__row">
-            <label class="form__label">Cadence</label>
-            <input
-              class="form__input form__input--cadence"
-              placeholder="step/min"
-            />
-          </div>
-          <div class="form__row form__row--hidden">
-            <label class="form__label">Elev Gain</label>
-            <input
-              class="form__input form__input--elevation"
-              placeholder="meters"
-            />
-          </div>
-          <button class="form__btn">OK</button>
-        </form>
 
         <!-- <li class="workout workout--running" data-id="1234567890">
           <h2 class="workout__title">Running on April 14</h2>
@@ -127,9 +142,7 @@
       </p>
     </div>
 
-    <div id="map">
-      <div class="overlay"></div>
-    </div>
+    <div id="map"></div>
 
     <div class="error__validation__popup">
       <span> X </span>
