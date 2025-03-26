@@ -181,52 +181,52 @@ GOOD LUCK 😀
 //     .then(data => console.log(data))
 
 // previous made functionalities
-const getJSON = function(url, errorMessage) {
-    return fetch(url)
-        .then(response => {
-            if (!response.ok) throw new Error(`${errorMessage}, ${response.status}`)
+// const getJSON = function(url, errorMessage) {
+//     return fetch(url)
+//         .then(response => {
+//             if (!response.ok) throw new Error(`${errorMessage}, ${response.status}`)
 
-            return response.json()
-        })
-}
+//             return response.json()
+//         })
+// }
 
-const getCountryDataAndNeighbour = function(country) {
-    getJSON(`https://restcountries.com/v3.1/name/${country}`, 'Couontry not found')
-        .then(data => {
-            // destructer first object in array
-            const [country] = data;
+// const getCountryDataAndNeighbour = function(country) {
+//     getJSON(`https://restcountries.com/v3.1/name/${country}`, 'Couontry not found')
+//         .then(data => {
+//             // destructer first object in array
+//             const [country] = data;
 
-            // Render country
-            renderCountry(country)
+//             // Render country
+//             renderCountry(country)
 
-            // Neighbourcode and fetch neighbour endpoint
-            const neighbourCode = country.borders?.[0]
+//             // Neighbourcode and fetch neighbour endpoint
+//             const neighbourCode = country.borders?.[0]
 
-            if (!neighbourCode) throw new Error(`This coountry does not have a neighbour`)
+//             if (!neighbourCode) throw new Error(`This coountry does not have a neighbour`)
 
-            return getJSON(`https://restcountries.com/v3.1/alpha/${neighbourCode}`, 'Country not found')
-        })
-        .then(data => {
-            // destructer first object in array
-            const [neighbourCountry] = data;
-            renderCountry(neighbourCountry, 'neighbour')
-        })
-        .catch(err => {
-            console.error(err)
-            errorMessage(`Sorry, something went wrong! ❌ ${err.message}, Try again!`)
-        })
-        .finally(() => countriesContainer.style.opacity = 1)
-}
+//             return getJSON(`https://restcountries.com/v3.1/alpha/${neighbourCode}`, 'Country not found')
+//         })
+//         .then(data => {
+//             // destructer first object in array
+//             const [neighbourCountry] = data;
+//             renderCountry(neighbourCountry, 'neighbour')
+//         })
+//         .catch(err => {
+//             console.error(err)
+//             errorMessage(`Sorry, something went wrong! ❌ ${err.message}, Try again!`)
+//         })
+//         .finally(() => countriesContainer.style.opacity = 1)
+// }
 
-const getJSONLocation = function(url, errorMessage = 'Something went wrong') {
-    return fetch(url)
-        .then(response =>  {
-            console.log(response);
-            if (!response.ok) throw new Error(`${errorMessage}, status ${response.status} ❌❌`);
+// const getJSONLocation = function(url, errorMessage = 'Something went wrong') {
+//     return fetch(url)
+//         .then(response =>  {
+//             console.log(response);
+//             if (!response.ok) throw new Error(`${errorMessage}, status ${response.status} ❌❌`);
             
-            return response.json()
-        })
-}
+//             return response.json()
+//         })
+// }
 
 // const whereAmI = function(lat, lng) {
 //     getJSONLocation(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}`, 'Could not fetch location data')
@@ -408,77 +408,256 @@ GOOD LUCK 😀
 
 ////////////////////////
 // ASYNC & AWAIT
-const getGeoLocation = function() {
-    return new Promise(function(resolve, reject) {
-        navigator.geolocation.getCurrentPosition(resolve, reject)
+// const getGeoLocation = function() {
+//     return new Promise(function(resolve, reject) {
+//         navigator.geolocation.getCurrentPosition(resolve, reject)
+//     })
+// }
+
+
+// const whereAmI = async function() {
+//     try {
+//          // get current geolocation 
+//         const geoData = await getGeoLocation()
+//         const {latitude: lat, longitude: lng} = geoData.coords
+
+//         // reverse geocoding
+//         const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}`)
+//         if (!res.ok) throw new Error('No reverse geocoding 👽')
+            
+
+//         const data = await res.json();
+
+//         // render country
+//         const resCountry = await fetch(`https://restcountries.com/v3.1/name/${data.countryName.split(" ")[0]}`);
+
+//         if (!resCountry.ok) throw new Error('No country found 👽')
+
+//         const dataCountry = await resCountry.json()
+//         const [country] = dataCountry
+
+//         renderCountry(country)
+
+//         // render neighbour country
+//         const resNeighborCountry = await fetch(`https://restcountries.com/v3.1/alpha/${country.borders[0]}`);
+
+//         if (!resNeighborCountry.ok) throw new Error('No neighbor country found 👽')
+
+//         const dataNeighborCountry = await resNeighborCountry.json()
+//         const [neighbor] = dataNeighborCountry
+
+//         renderCountry(neighbor, 'neighbour')
+
+//         return `${country.name.common}`
+//     } catch (error) {
+//         console.error(error)
+//         errorMessage(`🤡 Oops, ${error.message}`)
+
+//         // reject promise from async function
+//         throw error
+//     } finally {
+//         countriesContainer.style.opacity = 1
+//     }
+   
+// }
+// // whereAmI()
+
+// // console.log('1: will get the location');
+// // whereAmI()
+// //     .then(city => console.log(`2: the location is ${city}`))
+// //     .catch(err => console.error(err))
+// //     .finally(() => console.log(`3: finished getting location`))
+
+// console.log('1: will get the location');
+// (async function() {
+//     try {
+//         const city = await whereAmI()
+//         console.log(`2: the location is ${city}`)
+//     } catch (err) {
+//         console.error(err)
+//     } finally {
+//         console.log(`3: finished getting location`)
+//     }
+//     // also possible becuase it will always be executed
+//     // console.log(`3: finished getting location`)
+// })()
+
+///////////////////////////////////
+// Running promesis in paralel
+// const getJSON = function(url, errorMessage) {
+//     return fetch(url)
+//         .then(response => {
+//             if (!response.ok) throw new Error(`${errorMessage}, ${response.status}`)
+
+//             return response.json()
+//         })
+// }
+
+// const get3Countries = async function (c1, c2, c3) {
+//     try {
+//         // const [data1] = await getJSON(`https://restcountries.com/v3.1/name/${c1}`)
+//         // const [data2] = await getJSON(`https://restcountries.com/v3.1/name/${c2}`)
+//         // const [data3] = await getJSON(`https://restcountries.com/v3.1/name/${c3}`)
+
+//         // console.log([data1.capital, data2.capital, data3.capital]);
+
+//         const data = await Promise.all([
+//             getJSON(`https://restcountries.com/v3.1/name/${c1}`),      
+//             getJSON(`https://restcountries.com/v3.1/name/${c2}`), 
+//             getJSON(`https://restcountries.com/v3.1/name/${c3}`)
+//         ])
+//         const capital = data.map(country => country[0].capital ).flat();
+//         console.log(capital);
+
+//     } catch (error) {
+//         console.error(error)
+//     }
+  
+// }
+
+// get3Countries('netherlands', 'portugal','germany')
+
+////////////////////////////
+// Other promise combinators: race, allSettled and any
+const getJSON = function(url, errorMessage) {
+    return fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error(`${errorMessage}, ${response.status}`)
+
+            return response.json()
+        })
+}
+// Promise.race
+// (async function() {
+//     const res = await Promise.race([
+//         getJSON(`https://restcountries.com/v3.1/name/italy`),      
+//         getJSON(`https://restcountries.com/v3.1/name/netherlands`), 
+//         getJSON(`https://restcountries.com/v3.1/name/poland`)
+//     ]);
+//     console.log(res);
+// })()
+
+// timout function
+
+// const timeout = function(sec) {
+//     return new Promise(function (_, reject) {
+//         setTimeout(() => {
+//             reject(new Error('Request took to long'))
+//         }, sec * 1000);
+//     });
+// };
+
+// Promise.race([
+//     getJSON(`https://restcountries.com/v3.1/name/poland`),
+//     timeout(0.1)
+// ])
+// .then(data =>  console.log(data))
+// .catch(err => console.error(err))
+
+// Promise.allSettled
+// Promise.allSettled([
+//     Promise.resolve('Success'),
+//     Promise.reject('ERROR'),
+//     Promise.resolve('Another success'),
+// ]).then(res => console.log(res));
+
+// Promise.all([
+//     Promise.resolve('Success'),
+//     Promise.reject('ERROR'),
+//     Promise.resolve('Another success'),
+// ])
+// .then(res => console.log(res))
+// .catch(err => console.error(err));
+
+// // Promise.any [ES2021]
+// Promise.any([
+//     Promise.resolve('Success'),
+//     Promise.reject('ERROR'),
+//     Promise.resolve('Another success'),
+// ])
+// .then(res => console.log(res))
+// .catch(err => console.error(err));
+
+
+///////////////////////////////////////
+// Coding Challenge #3
+
+/* 
+PART 1
+Write an async function 'loadNPause' that recreates Coding Challenge #2, this time using async/await (only the part where the promise is consumed). Compare the two versions, think about the big differences, and see which one you like more.
+Don't forget to test the error handler, and to set the network speed to 'Fast 3G' in the dev tools Network tab.
+
+PART 2
+1. Create an async function 'loadAll' that receives an array of image paths 'imgArr';
+2. Use .map to loop over the array, to load all the images with the 'createImage' function (call the resulting array 'imgs')
+3. Check out the 'imgs' array in the console! Is it like you expected?
+4. Use a promise combinator function to actually get the images from the array 😉
+5. Add the 'paralell' class to all the images (it has some CSS styles).
+
+TEST DATA: ['img/img-1.jpg', 'img/img-2.jpg', 'img/img-3.jpg']. To test, turn off the 'loadNPause' function.
+
+GOOD LUCK 😀
+*/
+
+
+const wait = function(seconds) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, seconds * 1000);
     })
 }
 
+const imageContainer = document.querySelector('.images')
 
-const whereAmI = async function() {
-    try {
-         // get current geolocation 
-        const geoData = await getGeoLocation()
-        const {latitude: lat, longitude: lng} = geoData.coords
+const createImage = function(imgPath) {
+    return new Promise((resolve, reject) => {
+        const img = document.createElement('img')
+        img.src = imgPath
 
-        // reverse geocoding
-        const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}`)
-        if (!res.ok) throw new Error('No reverse geocoding 👽')
-            
+        img.addEventListener('load', function() {
+            imageContainer.appendChild(this)
+            resolve(img)
+        })
 
-        const data = await res.json();
-
-        // render country
-        const resCountry = await fetch(`https://restcountries.com/v3.1/name/${data.countryName.split(" ")[0]}`);
-
-        if (!resCountry.ok) throw new Error('No country found 👽')
-
-        const dataCountry = await resCountry.json()
-        const [country] = dataCountry
-
-        renderCountry(country)
-
-        // render neighbour country
-        const resNeighborCountry = await fetch(`https://restcountries.com/v3.1/alpha/${country.borders[0]}`);
-
-        if (!resNeighborCountry.ok) throw new Error('No neighbor country found 👽')
-
-        const dataNeighborCountry = await resNeighborCountry.json()
-        const [neighbor] = dataNeighborCountry
-
-        renderCountry(neighbor, 'neighbour')
-
-        return `${country.name.common}`
-    } catch (error) {
-        console.error(error)
-        errorMessage(`🤡 Oops, ${error.message}`)
-
-        // reject promise from async function
-        throw error
-    } finally {
-        countriesContainer.style.opacity = 1
-    }
-   
+        img.addEventListener('error', function() {
+            reject(new Error('Image not found'))
+        })
+    })
 }
-// whereAmI()
 
-// console.log('1: will get the location');
-// whereAmI()
-//     .then(city => console.log(`2: the location is ${city}`))
-//     .catch(err => console.error(err))
-//     .finally(() => console.log(`3: finished getting location`))
+let currentImage;
+// Part 1
+// const loadNPause = async function() {
+//     try{
+//         // load image 1
+//         let img = await createImage('./img/img-1.jpg')
+//         console.log('Image 1 is loaded');
+//         await wait(2)
+//         img.style.display = 'none'
 
-console.log('1: will get the location');
-(async function() {
-    try {
-        const city = await whereAmI()
-        console.log(`2: the location is ${city}`)
-    } catch (err) {
-        console.error(err)
-    } finally {
-        console.log(`3: finished getting location`)
-    }
-    // also possible becuase it will always be executed
-    // console.log(`3: finished getting location`)
-})()
+//         // load image 2
+//         img = await createImage('./img/img-2.jpg')
+//         console.log('Image 2 is loaded');
+//         await wait(2)
+//         img.style.display = 'none'
 
+//         // load image 3
+//         img = await createImage('./img/img-3.jpg')
+//         console.log('Image 3 is loaded');
+//         await wait(2)
+//         img.style.display = 'none'
+
+//     } catch (err) {
+//         console.error(err);
+//     } 
+    
+// }
+// loadNPause()
+
+
+const loadAll = async function(...imgArr) {
+    const imgs = imgArr.map(imgPath => createImage(imgPath))
+    Promise.all(imgs).then((img) => console.log(img))
+    console.log(imgs);
+}
+
+loadAll('img/img-1.jpg', 'img/img-2.jpg', 'img/img-3.jpg')
