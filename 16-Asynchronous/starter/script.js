@@ -340,7 +340,7 @@ PART 1
 If this part is too tricky for you, just watch the first part of the solution.
 
 PART 2
-2. Comsume the promise using .then and also add an error handler;
+2. Comsume the promise using .then and also add an error handler (catch);
 3. After the image has loaded, pause execution for 2 seconds using the wait function we created earlier;
 4. After the 2 seconds have passed, hide the current image (set display to 'none'), and load a second image (HINT: Use the image element returned by the createImage promise to hide the current image. You will need a global variable for that 😉);
 5. After the second image has loaded, pause execution for 2 seconds again;
@@ -350,58 +350,135 @@ TEST DATA: Images in the img folder. Test the error handler by passing a wrong i
 
 GOOD LUCK 😀
 */
-const wait = function(seconds) {
-    return new Promise((resolve) => {
-        setTimeout(resolve, seconds * 1000);
+// const wait = function(seconds) {
+//     return new Promise((resolve) => {
+//         setTimeout(resolve, seconds * 1000);
+//     })
+// }
+
+// const imageContainer = document.querySelector('.images')
+
+// const createImage = function(imgPath) {
+//     return new Promise((resolve, reject) => {
+//         const img = document.createElement('img')
+//         img.src = imgPath
+
+//         img.addEventListener('load', function() {
+//             imageContainer.appendChild(this)
+//             resolve(img)
+//         })
+
+//         img.addEventListener('error', function() {
+//             reject(new Error('Image not found'))
+//         })
+//     })
+// }
+
+// let currentImage;
+
+// createImage('./img/img-1.jpg')
+//     .then(img =>  {
+//         currentImage = img
+//         console.log('image 1 is loaded')
+//         return wait(2)
+//     })
+//     .then(() => {
+//         currentImage.style.display = 'none'
+//         return createImage('./img/img-2.jpg')
+//     })
+//     .then((img) => {
+//         currentImage = img
+//         console.log('image 2 is loaded')
+//         return wait(2)
+//     })
+//     .then(() => {
+//         currentImage.style.display = 'none'
+//         return createImage('./img/img-3.jpg')
+//     })
+//     .then((img) => {
+//         currentImage = img
+//         console.log('image 3 is loaded')
+//         return wait(2)
+//     })
+//     .then(() => {
+//         currentImage.style.display = 'none'
+//     })
+//     .catch(err => console.error(err))
+
+
+////////////////////////
+// ASYNC & AWAIT
+const getGeoLocation = function() {
+    return new Promise(function(resolve, reject) {
+        navigator.geolocation.getCurrentPosition(resolve, reject)
     })
 }
 
-const imageContainer = document.querySelector('.images')
 
-const createImage = function(imgPath) {
-    return new Promise((resolve, reject) => {
-        const img = document.createElement('img')
-        img.src = imgPath
+const whereAmI = async function() {
+    try {
+         // get current geolocation 
+        const geoData = await getGeoLocation()
+        const {latitude: lat, longitude: lng} = geoData.coords
 
-        img.addEventListener('load', function() {
-            imageContainer.appendChild(this)
-            resolve(img)
-        })
+        // reverse geocoding
+        const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}`)
+        if (!res.ok) throw new Error('No reverse geocoding 👽')
+            
 
-        img.addEventListener('error', function() {
-            reject(new Error('Image not loaded'))
-        })
-    })
+        const data = await res.json();
+
+        // render country
+        const resCountry = await fetch(`https://restcountries.com/v3.1/name/${data.countryName.split(" ")[0]}`);
+
+        if (!resCountry.ok) throw new Error('No country found 👽')
+
+        const dataCountry = await resCountry.json()
+        const [country] = dataCountry
+
+        renderCountry(country)
+
+        // render neighbour country
+        const resNeighborCountry = await fetch(`https://restcountries.com/v3.1/alpha/${country.borders[0]}`);
+
+        if (!resNeighborCountry.ok) throw new Error('No neighbor country found 👽')
+
+        const dataNeighborCountry = await resNeighborCountry.json()
+        const [neighbor] = dataNeighborCountry
+
+        renderCountry(neighbor, 'neighbour')
+
+        return `${country.name.common}`
+    } catch (error) {
+        console.error(error)
+        errorMessage(`🤡 Oops, ${error.message}`)
+
+        // reject promise from async function
+        throw error
+    } finally {
+        countriesContainer.style.opacity = 1
+    }
+   
 }
+// whereAmI()
 
-let currentImage;
+// console.log('1: will get the location');
+// whereAmI()
+//     .then(city => console.log(`2: the location is ${city}`))
+//     .catch(err => console.error(err))
+//     .finally(() => console.log(`3: finished getting location`))
 
-createImage('./img/img-1.jpg')
-    .then(img =>  {
-        currentImage = img
-        console.log('image is loaded')
-        return wait(2)
-    })
-    .then(() => {
-        currentImage.style.display = 'none'
-        return wait(2)
-    })
-    .then(() => {
-        currentImage.style.display = 'block'
-        createImage('./img/img-2.jpg')
-        return wait(2)
-    })
-    .then(() => {
-        currentImage.style.display = 'none'
-        return wait(2)
-    })
-    .then(() => {
-        currentImage.style.display = 'block'
-        createImage('./img/img-3.jpg')
-        return wait(2)
-    })
-    .then(() => {
-        currentImage.style.display = 'none'
-        return wait(2)
-    })
-    .catch(err => console.error(err))
+console.log('1: will get the location');
+(async function() {
+    try {
+        const city = await whereAmI()
+        console.log(`2: the location is ${city}`)
+    } catch (err) {
+        console.error(err)
+    } finally {
+        console.log(`3: finished getting location`)
+    }
+    // also possible becuase it will always be executed
+    // console.log(`3: finished getting location`)
+})()
+
