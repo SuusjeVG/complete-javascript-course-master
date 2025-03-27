@@ -593,29 +593,29 @@ GOOD LUCK 😀
 */
 
 // copied code from last challenge
-const wait = function(seconds) {
-    return new Promise((resolve) => {
-        setTimeout(resolve, seconds * 1000);
-    })
-}
+// const wait = function(seconds) {
+//     return new Promise((resolve) => {
+//         setTimeout(resolve, seconds * 1000);
+//     })
+// }
 
-const imageContainer = document.querySelector('.images')
+// const imageContainer = document.querySelector('.images')
 
-const createImage = function(imgPath) {
-    return new Promise((resolve, reject) => {
-        const img = document.createElement('img')
-        img.src = imgPath
+// const createImage = function(imgPath) {
+//     return new Promise((resolve, reject) => {
+//         const img = document.createElement('img')
+//         img.src = imgPath
 
-        img.addEventListener('load', function() {
-            imageContainer.appendChild(this)
-            resolve(img)
-        })
+//         img.addEventListener('load', function() {
+//             imageContainer.appendChild(this)
+//             resolve(img)
+//         })
 
-        img.addEventListener('error', function() {
-            reject(new Error('Image not found'))
-        })
-    })
-}
+//         img.addEventListener('error', function() {
+//             reject(new Error('Image not found'))
+//         })
+//     })
+// }
 
 // Part 1
 // const loadNPause = async function() {
@@ -652,23 +652,23 @@ const createImage = function(imgPath) {
 // 4. Use a promise combinator function to actually get the images from the array 😉
 // 5. Add the 'parallel' class to all the images (it has some CSS styles).
 
-const loadAll = async function(...imgArr) {
-    try {
-        // const imgs = imgArr.map(async imgPath => await createImage(imgPath))
+// const loadAll = async function(...imgArr) {
+//     try {
+//         // const imgs = imgArr.map(async imgPath => await createImage(imgPath))
 
-        const imgs = imgArr.map(imgPath => createImage(imgPath))
-        console.log(imgs);
+//         const imgs = imgArr.map(imgPath => createImage(imgPath))
+//         console.log(imgs);
         
-        // Promise.all(imgs).then((el) => {
-        //     el.forEach((el) => el.classList.add('parallel'))
-        // })
+//         // Promise.all(imgs).then((el) => {
+//         //     el.forEach((el) => el.classList.add('parallel'))
+//         // })
 
-        const imgEl = await Promise.all(imgs)
-        imgEl.forEach(el => el.classList.add('parallel'));
-    } catch(err) {
-        console.error(err)
-    }
+//         const imgEl = await Promise.all(imgs)
+//         imgEl.forEach(el => el.classList.add('parallel'));
+//     } catch(err) {
+//         console.error(err)
+//     }
 
-}
+// }
 
-loadAll('img/img-1.jpg', 'img/img-2.jpg', 'img/img-3.jpg')
+// loadAll('img/img-1.jpg', 'img/img-2.jpg', 'img/img-3.jpg')
