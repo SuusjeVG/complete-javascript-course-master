@@ -1,0 +1,21 @@
+{
+  "name": "modern-js-modules",
+  "version": "1.0.0",
+  "description": "Test file for using modules and npm",
+  "license": "ISC",
+  "author": "Susan van Glabbeek",
+  "type": "module",
+  "source": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "parcel",
+    "build": "parcel build"
+  },
+  "dependencies": {
+    "leaflet": "^1.9.4",
+    "lodash-es": "^4.17.21"
+  },
+  "devDependencies": {
+    "parcel": "^2.14.2"
+  }
+}
