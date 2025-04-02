@@ -125,6 +125,19 @@ console.log('peop he');
 
 //       const hello = 'test'
 
+// hot module relode (doesn't reload the page on refresh when local server is on)
 if (module.hot) {
       module.hot.accept();
 }
+
+// new methods from ES6, wich Parcel can't build back to ES5
+console.log(cart.find(el => el.product === 'bread'));
+Promise.resolve('TEST').then(t => console.log(t))
+
+// for Polifilling new methods or obejcts. Parcel only does syntax.
+import 'core-js/actual';
+// import 'core-js/actual/array/find';
+// import 'core-js/actual/promise';
+
+// Polifilling for async functions
+import 'regenerator-runtime/runtime'

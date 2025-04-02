@@ -1,4 +1,4 @@
-var budget = [
+const budget = Object.freeze([
   { value: 250, description: 'Sold old TV 📺', user: 'jonas' },
   { value: -45, description: 'Groceries 🥑', user: 'jonas' },
   { value: 3500, description: 'Monthly salary 👩‍💻', user: 'jonas' },
@@ -7,58 +7,61 @@ var budget = [
   { value: -20, description: 'Candy 🍭', user: 'matilda' },
   { value: -125, description: 'Toys 🚂', user: 'matilda' },
   { value: -1800, description: 'New Laptop 💻', user: 'jonas' },
-];
+]);
 
-var limits = {
+// you can still change elements of the existing data but not add new data.
+budget[0].value = 20435
+
+
+// immutable data (also working for arrays because it's also an object).
+const spendingLimits = Object.freeze({
   jonas: 1500,
   matilda: 100,
-};
+});
 
-var add = function (value, description, user) {
+// spendingLimits.jay = 1300;
+// console.log(spendingLimits);
+
+// spendingLimits?.[user] ?? 0
+const getLimit = user => spendingLimits[user] ? spendingLimits[user] : 0
+
+const addExpanse = function (value, description, user = 'Jonas') {
   if (!user) user = 'jonas';
   user = user.toLowerCase();
 
-  var lim;
-  if (limits[user]) {
-    lim = limits[user];
-  } else {
-    lim = 0;
-  }
+  // const limit = spendingLimits?.[user] ?? 0
+  const limit = getLimit(user)
 
-  if (value <= lim) {
-    budget.push({ value: -value, description: description, user: user });
+  if (value <= limit) {
+    budget.push({ value: -value, description, user});
   }
 };
-add(10, 'Pizza 🍕');
-add(100, 'Going to movies 🍿', 'Matilda');
-add(200, 'Stuff', 'Jay');
+// addExpanse(10, 'Pizza 🍕');
+// addExpanse(100, 'Going to movies 🍿', 'Matilda');
+// addExpanse(200, 'Stuff', 'Jay');
 console.log(budget);
 
-var check = function () {
-  for (var el of budget) {
-    var lim;
-    if (limits[el.user]) {
-      lim = limits[el.user];
-    } else {
-      lim = 0;
-    }
+const checkExpanses = function () {
+  for (const entry of budget) {
+    const limit = getLimit(entry.user)
 
-    if (el.value < -lim) {
-      el.flag = 'limit';
+    if (entry.value < -limit) {
+      entry.flag = 'limit';
     }
   }
 };
-check();
+checkExpanses();
 
-console.log(budget);
-
-var bigExpenses = function (limit) {
-  var output = '';
-  for (var el of budget) {
-    if (el.value <= -limit) {
-      output += el.description.slice(-2) + ' / '; // Emojis are 2 chars
-    }
+const logbigExpenses = function (limit) {
+  let output = '';
+  for (const entry of budget) {
+    // Emojis are 2 chars
+    output += entry.value <= -limit ? `${entry.description.slice(-2)} / ` : '';
   }
+  
   output = output.slice(0, -2); // Remove last '/ '
   console.log(output);
 };
+console.log(budget);
+
+logbigExpenses(100)
