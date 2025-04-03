@@ -1,0 +1,19 @@
+{
+  "name": "forkify-app",
+  "version": "1.0.0",
+  "description": "An app that can search for thousands of recepies.",
+  "type": "module",
+  "source": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "parcel",
+    "build": "parcel build"
+  },
+  "author": "Susan van Glabbeek",
+  "license": "ISC",
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.14.4",
+    "parcel": "^2.14.4",
+    "sass": "^1.86.2"
+  }
+}

@@ -8,6 +8,7 @@ const timeout = function (s) {
   });
 };
 
+console.log('test');
 // NEW API URL (instead of the one shown in the video)
 // https://forkify-api.jonas.io
 
@@ -15,4 +16,18 @@ const timeout = function (s) {
 
 ///////////////////////////////////////
 
-console.log('hello');
+const showRecipe = async function() {
+  try {
+    const res = await fetch('https://forkify-api.herokuapp.com/api/v2/recipes/5ed6604591c37cdc054bc886')
+
+    if (!res.ok) throw new Error('Failed to fetch ❌❌')
+    const data = await res.json()
+  
+    console.log(data);
+  } catch (err) {
+    console.log(err);
+    console.error(err.message)
+  }
+
+}
+showRecipe()
