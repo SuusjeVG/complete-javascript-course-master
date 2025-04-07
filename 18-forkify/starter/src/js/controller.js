@@ -1,7 +1,10 @@
 // import icons from '../img/icons.svg'
-import icons from 'url:../img/icons.svg' // (parcel)
+import icons from 'url:../img/icons.svg'; // (parcel)
+import { Fraction } from 'fractional';
 import 'core-js/actual';
 import 'regenerator-runtime/runtime'
+
+console.log(Fraction);
 
 const recipeContainer = document.querySelector('.recipe');
 
