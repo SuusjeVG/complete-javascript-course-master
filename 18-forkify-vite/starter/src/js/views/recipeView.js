@@ -1,11 +1,12 @@
+import View from './View.js';
 import icons from '../../img/icons.svg'
-// import {Fraction} from 'fractional';
-// var Fraction = require('fractional').Fraction
-// console.log(Fraction);
+import fracty from 'fracty';
 
-class recipeView {
+class recipeView extends View {
     #parentElement = document.querySelector('.recipe');
     #data;
+    #errorMessage = 'We could not find that recipe, please try another one!';
+    #message = ' '
 
     render(data) {
         this.#data = data
@@ -22,6 +23,36 @@ class recipeView {
               <use href="${icons}#icon-loader"></use>
             </svg>
           </div>
+        `
+        this.#clear()
+        this.#parentElement.insertAdjacentHTML('afterbegin', markup)
+    }
+
+    renderError(message = this.#errorMessage) {
+        const markup = `
+            <div class="error">
+                <div>
+                    <svg>
+                        <use href="${icons}#icon-alert-triangle"></use>
+                    </svg>
+                </div>
+                <p> ${message} </p>
+            </div>
+        `
+        this.#clear()
+        this.#parentElement.insertAdjacentHTML('afterbegin', markup)
+    }
+
+    renderMessage(message = this.#message) {
+        const markup = `
+            <div class="message">
+                <div>
+                    <svg>
+                        <use href="${icons}#icon-smile"></use>
+                    </svg>
+                </div>
+                <p> ${message} </p>
+            </div>
         `
         this.#clear()
         this.#parentElement.insertAdjacentHTML('afterbegin', markup)
@@ -90,7 +121,7 @@ class recipeView {
                                 <svg class="recipe__icon">
                                     <use href="${icons}#icon-check"></use>
                                 </svg>
-                                <div class="recipe__quantity">${ing.quantity}</div>
+                                <div class="recipe__quantity">${fracty(ing.quantity)}</div>
                                 <div class="recipe__description">
                                 <span class="recipe__unit">${ing.unit}</span>
                                     ${ing.description}
@@ -122,8 +153,8 @@ class recipeView {
         `
     }
 
-    addHandleRenderer() {
-
+    addHandleRenderer(handler) {
+        ['hashchange', 'load'].forEach(ev => window.addEventListener(ev, handler));
     }
 }
 
