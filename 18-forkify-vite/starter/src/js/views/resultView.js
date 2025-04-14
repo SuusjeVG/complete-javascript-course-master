@@ -1,58 +1,16 @@
+import View from './View.js';
 import icons from '../../img/icons.svg'
 
-class ResultView {
-    #parentElement = document.querySelector('.results');
-    #data;
-    #errorMessage = 'We could not find that food, please try another one!';
-    #message = ' ';
+class ResultView extends View {
+    _parentElement = document.querySelector('.results');
+    _errorMessage = 'No recipes found for this query, please try again!';
+    _message = ' ';
 
-    render(data) {
-        this.#data = data
-        const markup = this.#generateMarkup()
- 
-        this.#clear()
-        this.#parentElement.insertAdjacentHTML('afterbegin', markup)
-    }
-    
-    renderError(message = this.#errorMessage) {
-        const markup = `
-            <div class="error">
-                <div>
-                    <svg>
-                        <use href="${icons}#icon-alert-triangle"></use>
-                    </svg>
-                </div>
-                <p> ${message} </p>
-            </div>
-        `
-        this.#clear()
-        this.#parentElement.insertAdjacentHTML('afterbegin', markup)
-    }
-
-    renderMessage(message = this.#message) {
-        const markup = `
-            <div class="message">
-                <div>
-                    <svg>
-                        <use href="${icons}#icon-smile"></use>
-                    </svg>
-                </div>
-                <p> ${message} </p>
-            </div>
-        `
-        this.#clear()
-        this.#parentElement.insertAdjacentHTML('afterbegin', markup)
-    }
-
-    #clear() {
-        this.#parentElement.innerHTML = ''
-    }
-
-    #generateMarkup() {
-        return this.#data.map((result) => {
+    _generateMarkup() {
+        return this._data.map((result) => {
             return `
                 <li class="preview">
-                    <a class="preview__link preview__link--active" href="#${result.id}">
+                    <a class="preview__link" href="#${result.id}">
                         <figure class="preview__fig">
                             <img src="${result.image}" alt="${result.title}" />
                         </figure>

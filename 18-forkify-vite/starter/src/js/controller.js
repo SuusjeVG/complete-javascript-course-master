@@ -1,7 +1,8 @@
 import * as model from './model.js';
-import recipeView from './views/recipeView.js';
-import searchView from './views/searchView.js';
-import resultView from './views/resultView.js';
+import recipeView from './views/RecipeView.js';
+import searchView from './views/SearchView.js';
+import resultView from './views/ResultView.js';
+import paginationView from './views/PaginationView.js';
 
 // NEW API URL (instead of the one shown in the video)
 // https://forkify-api.jonas.io
@@ -32,6 +33,8 @@ const controlRecipes = async function() {
 
 const controlSearchResult = async function() {
   try{
+    resultView.renderSpinner()
+
     // 1) get search query
     const query = searchView.getQuery();
     if (!query) return
@@ -39,18 +42,20 @@ const controlSearchResult = async function() {
     // 2) load search results
     await model.loadSearchResults(query)
 
-    // 3) render search results
-    resultView.render(model.state.search.result);
-    
+    // 3) render search results + pagination
+    resultView.render(model.getSearchResultsPage(6));
+    paginationView.render(model.state.search);
 
   } catch(err) {
-
+    console.error(err.message, '❌❌' )
+    resultView.renderError()
   }
 }
 
 const init = function() {
   recipeView.addHandleRenderer(controlRecipes)
   searchView.addHandleSearch(controlSearchResult)
+  // paginationView.addHandleRenderer(controlSearchResult)
 }
 
 init()
