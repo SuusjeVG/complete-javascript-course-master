@@ -5,7 +5,7 @@ export default class View {
 
     render(data) {
         if (!data || (Array.isArray(data) && data.length === 0)) return this.renderError();
-
+        // console.log(data);
         this._data = data
         const markup = this._generateMarkup()
 
@@ -55,8 +55,41 @@ export default class View {
         this._parentElement.insertAdjacentHTML('afterbegin', markup)
     }
 
+    update(data) {
+        // if (!data || (Array.isArray(data) && data.length === 0)) return this.renderError();
+
+        this._data = data
+        const newMarkup = this._generateMarkup()
+
+        // lives in page not in memory
+        const newDom = document.createRange(). createContextualFragment(newMarkup);
+        const newElements = Array.from(newDom.querySelectorAll('*'))
+        const currElements = Array.from(this._parentElement.querySelectorAll('*'))
+
+        newElements.forEach((newEl, i) => {
+            const currEl = currElements[i];
+            // console.log(currEl, newEl.isEqualNode(currEl));
+
+            // update changed text
+            if(!newEl.isEqualNode(currEl) && newEl.firstChild?.nodeValue.trim() !== '') {
+                currEl.textContent = newEl.textContent
+            }
+
+            // update changed attributes
+            if(!newEl.isEqualNode(currEl)) {
+                // console.log(newEl.attributes);
+                Array.from(newEl.attributes).forEach(attr => {
+                    currEl.setAttribute(attr.name, attr.value)
+                })
+            }
+        })
+
+    }
+
     #clear() {
         this._parentElement.innerHTML = ''
     }
+
+
 }
 

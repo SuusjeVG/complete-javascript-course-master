@@ -8,7 +8,7 @@ export const state = {
         results: [],
         currentPage: 1,
         resultsPerPage: RES_PER_PAGE
-    }
+    },
 }
 
 export const loadRecipe = async function(id) {
@@ -66,4 +66,12 @@ export const getSearchResultsPage = function(page = state.search.currentPage) {
     const end = page * 10;
 
     return state.search.results.slice(start, end)
+}
+
+export const updateServings = function(newServings) {
+    state.recipe.ingredients.forEach(ing => {
+        ing.quantity = ing.quantity * newServings / state.recipe.servings
+     })
+
+    state.recipe.servings = newServings
 }
