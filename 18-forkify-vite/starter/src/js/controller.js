@@ -61,6 +61,10 @@ const controlServings = function(newServings) {
   recipeView.update(model.state.recipe)
 }
 
+const controlAddBookmark = function() {
+  model.addBookmark()
+}
+
 const init = function() {
   recipeView.addHandlerRenderer(controlRecipes)
   recipeView.addHandlerServing(controlServings)

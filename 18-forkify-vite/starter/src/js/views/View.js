@@ -62,7 +62,7 @@ export default class View {
         const newMarkup = this._generateMarkup()
 
         // lives in page not in memory
-        const newDom = document.createRange(). createContextualFragment(newMarkup);
+        const newDom = document.createRange().createContextualFragment(newMarkup);
         const newElements = Array.from(newDom.querySelectorAll('*'))
         const currElements = Array.from(this._parentElement.querySelectorAll('*'))
 
