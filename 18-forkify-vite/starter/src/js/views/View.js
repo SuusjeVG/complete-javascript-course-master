@@ -3,11 +3,13 @@ import icons from '../../img/icons.svg'
 export default class View {
     _data;
 
-    render(data) {
+    render(data, render = true) {
         if (!data || (Array.isArray(data) && data.length === 0)) return this.renderError();
         // console.log(data);
         this._data = data
         const markup = this._generateMarkup()
+
+        if(!render) return markup;
 
         this.#clear()
         this._parentElement.insertAdjacentHTML('afterbegin', markup)
@@ -62,7 +64,7 @@ export default class View {
         const newMarkup = this._generateMarkup()
 
         // lives in page not in memory
-        const newDom = document.createRange().createContextualFragment(newMarkup);
+        const newDom = document.createRange(). createContextualFragment(newMarkup);
         const newElements = Array.from(newDom.querySelectorAll('*'))
         const currElements = Array.from(this._parentElement.querySelectorAll('*'))
 
